@@ -1,0 +1,55 @@
+/* Mobile-first responsive utilities */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+@media (min-width: 769px) {
+  .show-mobile {
+    display: none !important;
+  }
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile-friendly cards */
+@media (max-width: 768px) {
+  .card-mobile {
+    padding: 1rem;
+  }
+  
+  .text-mobile-sm {
+    font-size: 0.875rem;
+  }
+  
+  .grid-mobile-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* Touch-friendly buttons */
+@media (max-width: 768px) {
+  button, a.button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+  .space-y-mobile-4 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .gap-mobile-2 {
+    gap: 0.5rem;
+  }
+}

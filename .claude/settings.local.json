@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next build)",
+      "Bash(start.bat)",
+      "Bash(venv/Scripts/activate)",
+      "Bash(uvicorn:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pip install:*)",
+      "Bash(python -c:*)",
+      "Bash(start http://localhost:3000)",
+      "Bash(start:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from uuid import UUID
 from datetime import datetime, timedelta
-from ..models.principal import ApprovalRequest, ApprovalDecision, ApprovalRow
-from ..core.auth import get_current_user, get_user_school_id
-from ..db.supabase import get_supabase_client
+from app.models.principal import ApprovalRequest, ApprovalDecision, ApprovalRow
+from app.core.auth import get_current_user, get_user_school_id
+from app.db.supabase import get_supabase_client
 
 router = APIRouter(prefix="/principal/approvals", tags=["principal-approvals"])
 

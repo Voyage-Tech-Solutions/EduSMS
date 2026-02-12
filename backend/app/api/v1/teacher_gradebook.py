@@ -4,9 +4,9 @@ from uuid import UUID
 from datetime import datetime
 import csv
 import io
-from ..models.teacher import CreateAssessmentRequest, ImportMarksRequest, LockGradebookRequest, AssessmentScore
-from ..core.auth import get_current_user, get_user_school_id
-from ..db.supabase import get_supabase_client
+from app.models.teacher import CreateAssessmentRequest, ImportMarksRequest, LockGradebookRequest, AssessmentScore
+from app.core.auth import get_current_user, get_user_school_id
+from app.db.supabase import get_supabase_client
 
 router = APIRouter(prefix="/teacher/gradebook", tags=["teacher-gradebook"])
 

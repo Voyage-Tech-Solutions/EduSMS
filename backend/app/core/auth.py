@@ -10,3 +10,7 @@ from app.core.security import (
     verify_password,
     get_password_hash,
 )
+
+def get_user_school_id(user: dict) -> str:
+    """Extract school_id from user profile"""
+    return user.get("school_id", "")

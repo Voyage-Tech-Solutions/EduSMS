@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional, List
 from uuid import UUID
 from datetime import date
-from ..models.principal import (
+from app.models.principal import (
     StudentOversightFilter, StudentOversightRow, FlagInterventionRequest,
     SendNotificationRequest, ChangeStatusRequest
 )
-from ..core.auth import get_current_user, get_user_school_id
-from ..db.supabase import get_supabase_client
+from app.core.auth import get_current_user, get_user_school_id
+from app.db.supabase import get_supabase_client
 
 router = APIRouter(prefix="/principal/students", tags=["principal-students"])
 

@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from uuid import UUID
 from datetime import datetime, timedelta
-from ..models.teacher import (
+from app.models.teacher import (
     CreateLessonPlanRequest, CreateAssessmentPlanRequest,
     UploadResourceRequest, CopyWeekRequest
 )
-from ..core.auth import get_current_user, get_user_school_id
-from ..db.supabase import get_supabase_client
+from app.core.auth import get_current_user, get_user_school_id
+from app.db.supabase import get_supabase_client
 
 router = APIRouter(prefix="/teacher/planning", tags=["teacher-planning"])
 

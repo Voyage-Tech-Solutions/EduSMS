@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { StatCard } from '@/components/dashboard';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
+    const router = useRouter();
     const [metrics, setMetrics] = useState<any>(null);
     const [alerts, setAlerts] = useState<any[]>([]);
     const [approvals, setApprovals] = useState<any[]>([]);
@@ -221,7 +223,7 @@ export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
                                 <span className="text-sm">Reports Submitted</span>
                                 <span className="font-bold">{academic?.reports_submitted || 0}/{academic?.total_teachers || 0} Teachers</span>
                             </div>
-                            <Button variant="outline" className="w-full mt-4">View Full Report</Button>
+                            <Button variant="outline" className="w-full mt-4" onClick={() => router.push('/dashboard/academics/report')}>View Full Report</Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -248,7 +250,7 @@ export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
                                 <span className="text-sm">Overdue (30+ days)</span>
                                 <span className="font-bold text-red-600">${finance?.overdue_amount || 0}</span>
                             </div>
-                            <Button variant="outline" className="w-full mt-4">View Arrears List</Button>
+                            <Button variant="outline" className="w-full mt-4" onClick={() => router.push('/dashboard/fees/arrears')}>View Arrears List</Button>
                         </div>
                     </CardContent>
                 </Card>

@@ -293,3 +293,179 @@ async def get_announcements(current_user: dict = Depends(get_current_user)):
         })
 
     return announcements
+
+
+def _verify_parent_owns_student(supabase, parent_id: str, student_id: str):
+    """Verify that a student is linked to this parent via guardians table."""
+    result = supabase.table("guardians").select("id").eq("user_id", parent_id).eq("student_id", student_id).execute()
+    if not result.data:
+        raise HTTPException(status_code=403, detail="This student is not linked to your account")
+
+
+def _build_subject_map(supabase, subject_ids: list) -> dict:
+    """Build a subject_id -> name mapping."""
+    if not subject_ids:
+        return {}
+    subjects = supabase.table("subjects").select("id, name").in_("id", list(subject_ids)).execute()
+    return {s["id"]: s["name"] for s in subjects.data}
+
+
+def _build_teacher_map(supabase, teacher_ids: list) -> dict:
+    """Build a teacher_id -> name mapping."""
+    if not teacher_ids:
+        return {}
+    teachers = supabase.table("user_profiles").select("id, first_name, last_name").in_("id", list(teacher_ids)).execute()
+    return {t["id"]: f"{t['first_name']} {t['last_name']}" for t in teachers.data}
+
+
+@router.get("/children/{student_id}/schedule/today")
+async def get_child_schedule_today(student_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "parent":
+        raise HTTPException(status_code=403, detail="Parent access required")
+
+    supabase = get_supabase_client()
+    _verify_parent_owns_student(supabase, current_user["id"], student_id)
+
+    student = supabase.table("students").select("id, class_id").eq("id", student_id).eq("status", "active").single().execute()
+    if not student.data or not student.data.get("class_id"):
+        return []
+
+    today_dow = datetime.now().weekday()
+    slots = supabase.table("timetable_slots").select(
+        "start_time, end_time, subject_id, teacher_id, room"
+    ).eq("class_id", student.data["class_id"]).eq("day_of_week", today_dow).order("start_time").execute()
+
+    if not slots.data:
+        return []
+
+    subject_ids = {s["subject_id"] for s in slots.data}
+    teacher_ids = {s["teacher_id"] for s in slots.data if s.get("teacher_id")}
+    subject_map = _build_subject_map(supabase, list(subject_ids))
+    teacher_map = _build_teacher_map(supabase, list(teacher_ids))
+
+    schedule = []
+    for slot in slots.data:
+        start = str(slot["start_time"])[:5]
+        schedule.append({
+            "time": start,
+            "subject": subject_map.get(slot["subject_id"], "Unknown"),
+            "teacher": teacher_map.get(slot.get("teacher_id"), "TBA"),
+            "room": slot.get("room", "TBA"),
+        })
+
+    return schedule
+
+
+@router.get("/children/{student_id}/assignments")
+async def get_child_assignments(student_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "parent":
+        raise HTTPException(status_code=403, detail="Parent access required")
+
+    supabase = get_supabase_client()
+    _verify_parent_owns_student(supabase, current_user["id"], student_id)
+
+    student = supabase.table("students").select("id, class_id").eq("id", student_id).eq("status", "active").single().execute()
+    if not student.data or not student.data.get("class_id"):
+        return []
+
+    today = datetime.now().date().isoformat()
+    seven_days = (datetime.now() + timedelta(days=7)).date().isoformat()
+
+    assignments = supabase.table("assignments").select(
+        "id, title, subject_id, due_date"
+    ).eq("class_id", student.data["class_id"]).eq("status", "active").gte("due_date", today).lte("due_date", seven_days).order("due_date").execute()
+
+    if not assignments.data:
+        return []
+
+    assignment_ids = [a["id"] for a in assignments.data]
+    submissions = supabase.table("assignment_submissions").select("assignment_id").eq("student_id", student_id).in_("assignment_id", assignment_ids).execute()
+    submitted_ids = {s["assignment_id"] for s in submissions.data} if submissions.data else set()
+
+    subject_ids = {a["subject_id"] for a in assignments.data}
+    subject_map = _build_subject_map(supabase, list(subject_ids))
+
+    tasks = []
+    for a in assignments.data:
+        if a["id"] in submitted_ids:
+            continue
+        due = a["due_date"]
+        if due == today:
+            due_label = "Today"
+        elif due == (datetime.now() + timedelta(days=1)).date().isoformat():
+            due_label = "Tomorrow"
+        else:
+            due_label = due
+
+        tasks.append({
+            "task": a["title"],
+            "subject": subject_map.get(a["subject_id"], "Unknown"),
+            "due": due_label,
+            "due_date": a["due_date"],
+        })
+
+    return tasks
+
+
+@router.get("/children/{student_id}/subjects")
+async def get_child_subject_performance(student_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "parent":
+        raise HTTPException(status_code=403, detail="Parent access required")
+
+    supabase = get_supabase_client()
+    _verify_parent_owns_student(supabase, current_user["id"], student_id)
+
+    grades = supabase.table("grade_entries").select("score, max_score, subject_id").eq("student_id", student_id).execute()
+    if not grades.data:
+        return []
+
+    subject_scores = {}
+    for grade in grades.data:
+        subject_id = grade["subject_id"]
+        percentage = float(grade["score"]) / float(grade["max_score"]) * 100
+        if subject_id not in subject_scores:
+            subject_scores[subject_id] = []
+        subject_scores[subject_id].append(percentage)
+
+    subject_map = _build_subject_map(supabase, list(subject_scores.keys()))
+
+    subject_performance = []
+    for subject_id, scores in subject_scores.items():
+        avg = round(sum(scores) / len(scores), 1)
+        subject_performance.append({
+            "subject": subject_map.get(subject_id, "Unknown"),
+            "percentage": avg,
+        })
+
+    subject_performance.sort(key=lambda x: x["subject"])
+    return subject_performance
+
+
+@router.get("/children/{student_id}/grades/recent")
+async def get_child_recent_grades(student_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "parent":
+        raise HTTPException(status_code=403, detail="Parent access required")
+
+    supabase = get_supabase_client()
+    _verify_parent_owns_student(supabase, current_user["id"], student_id)
+
+    grades = supabase.table("grade_entries").select(
+        "assessment_type, score, max_score, subject_id, created_at"
+    ).eq("student_id", student_id).order("created_at", desc=True).limit(10).execute()
+
+    if not grades.data:
+        return []
+
+    subject_ids = {g["subject_id"] for g in grades.data}
+    subject_map = _build_subject_map(supabase, list(subject_ids))
+
+    recent = []
+    for grade in grades.data:
+        percentage = round(float(grade["score"]) / float(grade["max_score"]) * 100, 1)
+        recent.append({
+            "assignment": grade.get("assessment_type", "Assessment"),
+            "subject": subject_map.get(grade["subject_id"], "Unknown"),
+            "score": percentage,
+        })
+
+    return recent

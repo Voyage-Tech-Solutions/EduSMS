@@ -216,30 +216,12 @@ async def list_guardians(
     school_id = current_user.get("school_id")
     
     if supabase_admin:
-        # Verify student belongs to school
         student = supabase_admin.table("students").select("id").eq("id", student_id).eq("school_id", school_id).execute()
-        
         if not student.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Student not found"
-            )
-        
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
         result = supabase_admin.table("guardians").select("*").eq("student_id", student_id).execute()
         return result.data
-    else:
-        return [
-            {
-                "id": "mock-guardian-1",
-                "student_id": student_id,
-                "first_name": "Jane",
-                "last_name": "Doe",
-                "relationship": "mother",
-                "phone": "+1234567890",
-                "email": "jane.doe@email.com",
-                "is_primary": True,
-            }
-        ]
+    return []
 
 
 @router.post("/{student_id}/guardians", response_model=GuardianResponse, status_code=status.HTTP_201_CREATED)
@@ -250,7 +232,6 @@ async def add_guardian(
 ):
     """Add a guardian to a student"""
     school_id = current_user.get("school_id")
-    
     guardian_dict = {
         "student_id": student_id,
         "first_name": guardian_data.first_name,
@@ -260,18 +241,82 @@ async def add_guardian(
         "email": guardian_data.email,
         "is_primary": guardian_data.is_primary,
     }
-    
     if supabase_admin:
-        # Verify student belongs to school
         student = supabase_admin.table("students").select("id").eq("id", student_id).eq("school_id", school_id).execute()
-        
         if not student.data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Student not found"
-            )
-        
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
         result = supabase_admin.table("guardians").insert(guardian_dict).execute()
         return result.data[0]
-    else:
-        return {**guardian_dict, "id": "mock-new-guardian"}
+    return {**guardian_dict, "id": "mock-new-guardian"}
+
+
+# ============== DOCUMENTS ==============
+
+@router.get("/{student_id}/documents")
+async def list_student_documents(
+    student_id: str,
+    current_user: dict = Depends(require_teacher),
+):
+    """List documents for a student"""
+    school_id = current_user.get("school_id")
+    if supabase_admin:
+        student = supabase_admin.table("students").select("id").eq("id", student_id).eq("school_id", school_id).execute()
+        if not student.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        result = supabase_admin.table("student_documents").select("*").eq("student_id", student_id).execute()
+        return result.data
+    return []
+
+
+@router.post("/{student_id}/documents")
+async def add_student_document(
+    student_id: str,
+    document_data: dict,
+    current_user: dict = Depends(require_office_admin),
+):
+    """Add document to student"""
+    school_id = current_user.get("school_id")
+    if supabase_admin:
+        student = supabase_admin.table("students").select("id").eq("id", student_id).eq("school_id", school_id).execute()
+        if not student.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        doc_dict = {
+            "student_id": student_id,
+            "document_type": document_data["document_type"],
+            "file_url": document_data.get("file_url"),
+            "uploaded": document_data.get("uploaded", False),
+            "verified": document_data.get("verified", False)
+        }
+        result = supabase_admin.table("student_documents").insert(doc_dict).execute()
+        return result.data[0]
+    return {"id": "mock-doc", **document_data}
+
+
+@router.patch("/documents/{document_id}")
+async def update_student_document(
+    document_id: str,
+    update_data: dict,
+    current_user: dict = Depends(require_office_admin),
+):
+    """Update/verify document"""
+    user_id = current_user.get("id")
+    if update_data.get("verified"):
+        update_data["verified_by"] = user_id
+        update_data["verified_at"] = datetime.now().isoformat()
+    if supabase_admin:
+        result = supabase_admin.table("student_documents").update(update_data).eq("id", document_id).execute()
+        if not result.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+        return result.data[0]
+    return {"id": document_id, **update_data}
+
+
+@router.get("/export")
+async def export_students(
+    format: str = Query("csv", regex="^(csv|pdf)$"),
+    grade_id: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: dict = Depends(require_office_admin),
+):
+    """Export students data"""
+    return {"message": "Export functionality", "format": format}

@@ -15,7 +15,9 @@
       "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial commit: EduSMS school management platform\n\nFull-stack multi-tenant school management SaaS with:\n- Backend: FastAPI + Supabase \\(auth, database, storage\\)\n- Frontend: Next.js 16 + shadcn/ui + Tailwind CSS\n- Role-based access \\(system admin, principal, teacher, office admin, parent, student\\)\n- Docker and CI/CD configuration\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git branch:*)",
       "Bash(git remote add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(dir /b \"C:\\\\Users\\\\bathini bona\\\\Documents\\\\EduSMS\")",
+      "Bash(ls:*)"
     ]
   }
 }

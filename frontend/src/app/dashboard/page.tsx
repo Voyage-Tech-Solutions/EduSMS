@@ -6,11 +6,10 @@ import {
     AdminDashboard,
     TeacherDashboard,
     ParentDashboard,
-    StudentDashboard,
     SystemAdminDashboard,
 } from '@/components/dashboard';
 import { OfficeAdminDashboard } from '@/components/dashboard/office-admin-dashboard';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 export default function DashboardPage() {
     const { profile, isLoading } = useAuth();
@@ -35,10 +34,16 @@ export default function DashboardPage() {
                 return <TeacherDashboard />;
             case 'parent':
                 return <ParentDashboard />;
-            case 'student':
-                return <StudentDashboard />;
             default:
-                return <AdminDashboard />;
+                return (
+                    <div className="flex items-center justify-center h-[calc(100vh-100px)]">
+                        <div className="text-center">
+                            <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
+                            <h2 className="mt-4 text-xl font-semibold text-slate-900">Access Error</h2>
+                            <p className="mt-2 text-slate-500">Your role is not recognized. Please contact your administrator.</p>
+                        </div>
+                    </div>
+                );
         }
     };
 

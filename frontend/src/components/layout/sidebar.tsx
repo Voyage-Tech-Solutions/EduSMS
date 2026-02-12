@@ -68,13 +68,6 @@ const parentNavItems: NavItem[] = [
     { title: 'Announcements', href: '/dashboard/announcements', icon: Bell },
 ];
 
-const studentNavItems: NavItem[] = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'My Classes', href: '/dashboard/classes', icon: BookOpen },
-    { title: 'Assignments', href: '/dashboard/assignments', icon: FileText },
-    { title: 'Grades', href: '/dashboard/grades', icon: GraduationCap },
-    { title: 'Attendance', href: '/dashboard/attendance', icon: CalendarCheck },
-];
 
 const officeAdminNavItems: NavItem[] = [
     { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -124,8 +117,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
                   profile?.role === 'principal' ? principalNavItems :
                   profile?.role === 'office_admin' ? officeAdminNavItems :
                   profile?.role === 'teacher' ? teacherNavItems :
-                  profile?.role === 'parent' ? parentNavItems :
-                  profile?.role === 'student' ? studentNavItems : navItems;
+                  profile?.role === 'parent' ? parentNavItems : navItems;
 
     const filteredNavItems = items.filter((item) => {
         if (!item.roles) return true;

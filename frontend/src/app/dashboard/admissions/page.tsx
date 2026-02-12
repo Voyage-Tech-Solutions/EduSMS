@@ -29,7 +29,7 @@ export default function AdmissionsPage() {
     const [applications, setApplications] = useState<any[]>([]);
     const [grades, setGrades] = useState<any[]>([]);
     const [classes, setClasses] = useState<any[]>([]);
-    const [stats, setStats] = useState({ total: 0, pending: 0, under_review: 0, approved: 0, enrolled: 0 });
+    const [stats, setStats] = useState({ total: 0, incomplete: 0, pending: 0, under_review: 0, approved: 0, enrolled: 0 });
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [loading, setLoading] = useState(true);

@@ -313,7 +313,7 @@ async def update_student_document(
 
 @router.get("/export")
 async def export_students(
-    format: str = Query("csv", regex="^(csv|pdf)$"),
+    format: str = Query("csv", pattern="^(csv|pdf)$"),
     grade_id: Optional[str] = None,
     status: Optional[str] = None,
     current_user: dict = Depends(require_office_admin),

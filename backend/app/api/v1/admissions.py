@@ -377,7 +377,7 @@ async def update_document(
 
 @router.get("/export")
 async def export_applications(
-    format: str = Query("csv", regex="^(csv|pdf)$"),
+    format: str = Query("csv", pattern="^(csv|pdf)$"),
     status_filter: Optional[str] = None,
     term_id: Optional[str] = None,
     current_user: dict = Depends(require_office_admin),

@@ -11,8 +11,8 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 export default function PrincipalApprovalsPage() {
-  const [approvals, setApprovals] = useState([]);
-  const [summary, setSummary] = useState({});
+  const [approvals, setApprovals] = useState<any>([]);
+  const [summary, setSummary] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

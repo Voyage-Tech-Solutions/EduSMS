@@ -55,12 +55,15 @@ const systemAdminNavItems: NavItem[] = [
 ];
 
 const teacherNavItems: NavItem[] = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'My Classes', href: '/dashboard/classes', icon: BookOpen },
-    { title: 'Attendance', href: '/dashboard/attendance', icon: CalendarCheck },
-    { title: 'Gradebook', href: '/dashboard/gradebook', icon: GraduationCap },
-    { title: 'Planning', href: '/dashboard/planning', icon: FileText },
-    { title: 'Reports', href: '/dashboard/reports', icon: FileText },
+    { title: 'Dashboard', href: '/dashboard/teacher', icon: LayoutDashboard },
+    { title: 'My Timetable', href: '/dashboard/teacher/timetable', icon: CalendarCheck },
+    { title: 'My Classes', href: '/dashboard/teacher/classes', icon: BookOpen },
+    { title: 'Attendance', href: '/dashboard/teacher/attendance', icon: CalendarCheck },
+    { title: 'Gradebook', href: '/dashboard/teacher/gradebook', icon: GraduationCap },
+    { title: 'Assignments', href: '/dashboard/teacher/assignments', icon: FileText },
+    { title: 'Planning', href: '/dashboard/teacher/planning', icon: BookOpen },
+    { title: 'Messages', href: '/dashboard/teacher/messages', icon: Bell },
+    { title: 'Reports', href: '/dashboard/teacher/reports', icon: FileText },
 ];
 
 const parentNavItems: NavItem[] = [
@@ -78,14 +81,14 @@ const parentNavItems: NavItem[] = [
 
 
 const officeAdminNavItems: NavItem[] = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'Students', href: '/dashboard/students', icon: Users },
-    { title: 'Admissions', href: '/dashboard/admissions', icon: UserPlus },
-    { title: 'Attendance', href: '/dashboard/attendance', icon: CalendarCheck },
-    { title: 'Fees & Billing', href: '/dashboard/fees', icon: CreditCard },
-    { title: 'Documents', href: '/dashboard/documents', icon: FileText },
-    { title: 'Reports', href: '/dashboard/reports', icon: FileText },
-    { title: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { title: 'Dashboard', href: '/dashboard/office-admin', icon: LayoutDashboard },
+    { title: 'Students', href: '/dashboard/office-admin/students', icon: Users },
+    { title: 'Admissions', href: '/dashboard/office-admin/admissions', icon: UserPlus },
+    { title: 'Attendance', href: '/dashboard/office-admin/attendance', icon: CalendarCheck },
+    { title: 'Fees & Billing', href: '/dashboard/office-admin/fees', icon: CreditCard },
+    { title: 'Documents', href: '/dashboard/office-admin/documents', icon: FileText },
+    { title: 'Reports', href: '/dashboard/office-admin/reports', icon: FileText },
+    { title: 'Settings', href: '/dashboard/office-admin/settings', icon: Settings },
 ];
 
 const principalNavItems: NavItem[] = [

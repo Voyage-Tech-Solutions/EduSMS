@@ -12,8 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Download, Flag, Mail, Edit } from "lucide-react";
 
 export default function PrincipalStudentsPage() {
-  const [students, setStudents] = useState([]);
-  const [summary, setSummary] = useState({});
+  const [students, setStudents] = useState<any>([]);
+  const [summary, setSummary] = useState<any>({});
   const [filters, setFilters] = useState({ search: "", status: "", risk_level: "" });
   const [loading, setLoading] = useState(true);
 

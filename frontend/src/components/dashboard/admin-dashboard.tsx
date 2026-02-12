@@ -54,23 +54,23 @@ export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
             const headers = { 'Authorization': `Bearer ${session.access_token}` };
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
-            const [metricsRes, alertsRes, approvalsRes, academicRes, financeRes, staffRes, activityRes] = await Promise.all([
-                fetch(`${baseUrl}/principal/dashboard/metrics`, { headers }).catch(() => ({ ok: false } as Response)),
-                fetch(`${baseUrl}/principal/alerts`, { headers }).catch(() => ({ ok: false } as Response)),
-                fetch(`${baseUrl}/principal/approvals`, { headers }).catch(() => ({ ok: false } as Response)),
-                fetch(`${baseUrl}/principal/academic/performance`, { headers }).catch(() => ({ ok: false } as Response)),
-                fetch(`${baseUrl}/principal/finance/overview`, { headers }).catch(() => ({ ok: false } as Response)),
-                fetch(`${baseUrl}/principal/staff/insight`, { headers }).catch(() => ({ ok: false } as Response)),
-                fetch(`${baseUrl}/principal/activity/recent`, { headers }).catch(() => ({ ok: false } as Response))
+            const [metricsRes] = await Promise.all([
+                fetch(`${baseUrl}/principal/summary`, { headers }).catch(() => ({ ok: false } as Response))
             ]);
 
-            if (metricsRes.ok) setMetrics(await metricsRes.json());
-            if (alertsRes.ok) setAlerts(await alertsRes.json());
-            if (approvalsRes.ok) setApprovals(await approvalsRes.json());
-            if (academicRes.ok) setAcademic(await academicRes.json());
-            if (financeRes.ok) setFinance(await financeRes.json());
-            if (staffRes.ok) setStaff(await staffRes.json());
-            if (activityRes.ok) setActivity(await activityRes.json());
+            if (metricsRes.ok) {
+                const data = await metricsRes.json();
+                setMetrics({
+                    total_students: data.total_students,
+                    attendance_rate: data.attendance_rate,
+                    at_risk_count: data.students_at_risk,
+                    collection_rate: data.fee_collection_rate,
+                    outstanding_balance: data.outstanding_balance
+                });
+                setAcademic(data.academic);
+                setFinance(data.finance);
+                setStaff(data.staff);
+            }
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error);
         } finally {
@@ -217,11 +217,11 @@ export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm">Assessment Completion</span>
-                                <span className="font-bold">{academic?.completion_rate || 0}%</span>
+                                <span className="font-bold">{academic?.assessment_completion?.completion_rate || 0}%</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm">Reports Submitted</span>
-                                <span className="font-bold">{academic?.reports_submitted || 0}/{academic?.total_teachers || 0} Teachers</span>
+                                <span className="font-bold">{academic?.reports_submitted?.submitted || 0}/{academic?.reports_submitted?.expected || 0} Teachers</span>
                             </div>
                             <Button variant="outline" className="w-full mt-4" onClick={() => router.push('/dashboard/academics/report')}>View Full Report</Button>
                         </div>
@@ -244,11 +244,11 @@ export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm">Outstanding Balance</span>
-                                <span className="font-bold text-amber-600">${finance?.outstanding_balance || 0}</span>
+                                <span className="font-bold text-amber-600">${finance?.outstanding || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm">Overdue (30+ days)</span>
-                                <span className="font-bold text-red-600">${finance?.overdue_amount || 0}</span>
+                                <span className="font-bold text-red-600">${finance?.overdue_30 || 0}</span>
                             </div>
                             <Button variant="outline" className="w-full mt-4" onClick={() => router.push('/dashboard/fees/arrears')}>View Arrears List</Button>
                         </div>
@@ -271,11 +271,11 @@ export function AdminDashboard({ isSystemAdmin = false }: AdminDashboardProps) {
                             <p className="text-sm text-slate-500">Active Teachers</p>
                         </div>
                         <div className="p-4 rounded-lg bg-slate-50">
-                            <p className="text-2xl font-bold">{staff?.marking_complete || 0}%</p>
+                            <p className="text-2xl font-bold">{staff?.marking_complete_rate || 0}%</p>
                             <p className="text-sm text-slate-500">Marking Complete</p>
                         </div>
                         <div className="p-4 rounded-lg bg-slate-50">
-                            <p className="text-2xl font-bold">{staff?.staff_absent || 0}</p>
+                            <p className="text-2xl font-bold">{staff?.absent_today || 0}</p>
                             <p className="text-sm text-slate-500">Staff Absent Today</p>
                         </div>
                         <div className="p-4 rounded-lg bg-slate-50">

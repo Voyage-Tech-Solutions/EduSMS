@@ -1,0 +1,127 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Download, TrendingUp, TrendingDown } from "lucide-react";
+
+export default function ParentAcademicsPage() {
+  const [academics, setAcademics] = useState<any>({ subjects: [], assessments: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAcademics();
+  }, []);
+
+  const fetchAcademics = async () => {
+    const studentId = "student-id"; // Get from context
+    const response = await fetch(`/api/v1/parent/academics?student_id=${studentId}`);
+    const data = await response.json();
+    setAcademics(data);
+    setLoading(false);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants: any = { good: "default", at_risk: "destructive", failing: "destructive" };
+    return <Badge variant={variants[status] || "outline"}>{status}</Badge>;
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Academic Performance</h1>
+          <p className="text-muted-foreground">Track your child's academic progress</p>
+        </div>
+        <Button><Download className="w-4 h-4 mr-2" />Download Report Card</Button>
+      </div>
+
+      {/* Overall Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Overall Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <div className="text-4xl font-bold">{academics.overall_average || 0}%</div>
+            <div className="flex-1">
+              <Progress value={academics.overall_average || 0} className="h-3" />
+            </div>
+            <div>
+              {academics.overall_average >= 70 ? (
+                <TrendingUp className="w-6 h-6 text-green-500" />
+              ) : (
+                <TrendingDown className="w-6 h-6 text-red-500" />
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Subject Breakdown */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Subject Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Subject</TableHead>
+                <TableHead>Average</TableHead>
+                <TableHead>Progress</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {academics.subjects.map((subject: any) => (
+                <TableRow key={subject.subject}>
+                  <TableCell className="font-medium">{subject.subject}</TableCell>
+                  <TableCell>{subject.average}%</TableCell>
+                  <TableCell>
+                    <Progress value={subject.average} className="w-32" />
+                  </TableCell>
+                  <TableCell>{getStatusBadge(subject.status)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Assessment History */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Assessments</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Assessment</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Score</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Teacher Comment</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {academics.assessments.slice(0, 10).map((assessment: any) => (
+                <TableRow key={assessment.id}>
+                  <TableCell className="font-medium">{assessment.assessments?.title || "N/A"}</TableCell>
+                  <TableCell>{assessment.assessments?.subjects?.name || "N/A"}</TableCell>
+                  <TableCell>{assessment.score || "N/A"}</TableCell>
+                  <TableCell>{new Date().toLocaleDateString()}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">-</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

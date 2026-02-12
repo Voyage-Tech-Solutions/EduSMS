@@ -129,7 +129,7 @@ export default function PrincipalStudentsPage() {
           <Select value={filters.grade} onValueChange={(val) => setFilters({...filters, grade: val})}>
             <SelectTrigger><SelectValue placeholder="All Grades" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Grades</SelectItem>
+              <SelectItem value="all">All Grades</SelectItem>
               <SelectItem value="grade1">Grade 1</SelectItem>
             </SelectContent>
           </Select>
@@ -144,7 +144,7 @@ export default function PrincipalStudentsPage() {
           <Select value={filters.risk} onValueChange={(val) => setFilters({...filters, risk: val})}>
             <SelectTrigger><SelectValue placeholder="All Risk Levels" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Risk Levels</SelectItem>
+              <SelectItem value="all">All Risk Levels</SelectItem>
               <SelectItem value="any">Any Risk</SelectItem>
               <SelectItem value="attendance">Attendance Risk</SelectItem>
               <SelectItem value="academic">Academic Risk</SelectItem>

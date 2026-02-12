@@ -19,6 +19,7 @@ from app.api.v1.student import router as student_router
 from app.api.v1.assessments import router as assessments_router
 from app.api.v1.principal_students import router as principal_students_router
 from app.api.v1.principal_approvals import router as principal_approvals_router
+from app.api.v1.principal_students_approvals import router as principal_students_approvals_router
 from app.api.v1.teacher_gradebook import router as teacher_gradebook_router
 from app.api.v1.teacher_planning import router as teacher_planning_router
 from app.api.v1.parent_dashboard import router as parent_dashboard_router
@@ -44,6 +45,7 @@ api_router.include_router(system_admin_router)
 api_router.include_router(principal_router, prefix="/principal", tags=["principal"])
 api_router.include_router(principal_students_router)
 api_router.include_router(principal_approvals_router)
+api_router.include_router(principal_students_approvals_router, prefix="/principal", tags=["principal_students_approvals"])
 api_router.include_router(principal_oversight_router, prefix="/principal", tags=["principal_oversight"])
 api_router.include_router(office_admin_router, prefix="/office-admin", tags=["office_admin"])
 api_router.include_router(teacher_router, prefix="/teacher", tags=["teacher"])

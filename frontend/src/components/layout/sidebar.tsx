@@ -24,6 +24,9 @@ import {
     Shield,
     Activity,
     Flag,
+    AlertTriangle,
+    TrendingUp,
+    Briefcase,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -86,15 +89,16 @@ const officeAdminNavItems: NavItem[] = [
 ];
 
 const principalNavItems: NavItem[] = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'Academics', href: '/dashboard/academics', icon: BookOpen },
-    { title: 'Attendance', href: '/dashboard/attendance', icon: CalendarCheck },
-    { title: 'Finance', href: '/dashboard/fees', icon: CreditCard },
-    { title: 'Staff', href: '/dashboard/staff', icon: Users },
-    { title: 'Students', href: '/dashboard/students', icon: GraduationCap },
-    { title: 'Reports', href: '/dashboard/reports', icon: FileText },
-    { title: 'Approvals', href: '/dashboard/approvals', icon: Shield },
-    { title: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { title: 'Dashboard', href: '/dashboard/principal', icon: LayoutDashboard },
+    { title: 'Approvals & Decisions', href: '/dashboard/principal/approvals', icon: Shield },
+    { title: 'Students', href: '/dashboard/principal/students', icon: Users },
+    { title: 'At Risk Students', href: '/dashboard/principal/risk', icon: AlertTriangle },
+    { title: 'Academics', href: '/dashboard/principal/academic', icon: BookOpen },
+    { title: 'Attendance', href: '/dashboard/principal/attendance', icon: CalendarCheck },
+    { title: 'Finance', href: '/dashboard/principal/finance', icon: CreditCard },
+    { title: 'Staff', href: '/dashboard/principal/staff', icon: Briefcase },
+    { title: 'Reports & Analytics', href: '/dashboard/principal/reports', icon: TrendingUp },
+    { title: 'Settings', href: '/dashboard/principal/settings', icon: Settings },
 ];
 
 const navItems: NavItem[] = [

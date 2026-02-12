@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from typing import Optional
-from app.core.supabase import get_supabase_client
+from app.db.supabase import get_supabase_client
 
 router = APIRouter()
 

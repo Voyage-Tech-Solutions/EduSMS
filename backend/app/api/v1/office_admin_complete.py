@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from datetime import datetime, timedelta
 from pydantic import BaseModel
-from app.core.supabase import get_supabase_client
+from app.db.supabase import get_supabase_client
 
 router = APIRouter()
 

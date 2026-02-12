@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, XCircle, Clock, AlertTriangle, DollarSign, BookOpen, FileText, MessageSquare } from "lucide-react";
+import { CheckCircle, XCircle, Clock, AlertTriangle, DollarSign, BookOpen, FileText, MessageSquare, Calendar } from "lucide-react";
+import Link from "next/link";
 
 export default function ParentDashboardPage() {
   const [dashboard, setDashboard] = useState<any>({});
@@ -97,9 +98,9 @@ export default function ParentDashboardPage() {
             </div>
           </div>
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => window.location.href = "/dashboard/parent-portal/attendance"}>
-              View Attendance
-            </Button>
+            <Link href="/dashboard/parent-portal/attendance">
+              <Button variant="outline" size="sm">View Attendance</Button>
+            </Link>
             <Button variant="outline" size="sm">Notify School</Button>
           </div>
         </CardContent>
@@ -137,12 +138,12 @@ export default function ParentDashboardPage() {
             </div>
           </div>
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => window.location.href = "/dashboard/parent-portal/academics"}>
-              View Full Report
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => window.location.href = "/dashboard/parent-portal/assignments"}>
-              View Assignments
-            </Button>
+            <Link href="/dashboard/parent-portal/academics">
+              <Button variant="outline" size="sm">View Full Report</Button>
+            </Link>
+            <Link href="/dashboard/parent-portal/assignments">
+              <Button variant="outline" size="sm">View Assignments</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
@@ -173,10 +174,12 @@ export default function ParentDashboardPage() {
             </div>
           </div>
           <div className="mt-4 flex gap-2">
-            <Button size="sm" onClick={() => window.location.href = "/dashboard/parent-portal/fees"}>Pay Now</Button>
-            <Button variant="outline" size="sm" onClick={() => window.location.href = "/dashboard/parent-portal/fees"}>
-              View Statement
-            </Button>
+            <Link href="/dashboard/parent-portal/fees">
+              <Button size="sm">Pay Now</Button>
+            </Link>
+            <Link href="/dashboard/parent-portal/fees">
+              <Button variant="outline" size="sm">View Statement</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
@@ -213,27 +216,35 @@ export default function ParentDashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Button variant="outline" className="h-20 flex flex-col gap-2" onClick={() => window.location.href = "/dashboard/parent-portal/fees"}>
-              <DollarSign className="w-6 h-6" />
-              Pay Fees
-            </Button>
-            <Button variant="outline" className="h-20 flex flex-col gap-2" onClick={() => window.location.href = "/dashboard/parent-portal/messages"}>
-              <MessageSquare className="w-6 h-6" />
-              Message Teacher
-              {dashboard.unread_messages > 0 && (
-                <Badge variant="destructive" className="absolute top-2 right-2">{dashboard.unread_messages}</Badge>
-              )}
-            </Button>
-            <Button variant="outline" className="h-20 flex flex-col gap-2" onClick={() => window.location.href = "/dashboard/parent-portal/documents"}>
-              <FileText className="w-6 h-6" />
-              Upload Document
-            </Button>
-            <Button variant="outline" className="h-20 flex flex-col gap-2" onClick={() => window.location.href = "/dashboard/parent-portal/academics"}>
-              <BookOpen className="w-6 h-6" />
-              View Report Card
-            </Button>
+            <Link href="/dashboard/parent-portal/fees">
+              <Button variant="outline" className="h-20 flex flex-col gap-2">
+                <DollarSign className="w-6 h-6" />
+                Pay Fees
+              </Button>
+            </Link>
+            <Link href="/dashboard/parent-portal/messages">
+              <Button variant="outline" className="h-20 flex flex-col gap-2 relative">
+                <MessageSquare className="w-6 h-6" />
+                Message Teacher
+                {dashboard.unread_messages > 0 && (
+                  <Badge variant="destructive" className="absolute top-2 right-2">{dashboard.unread_messages}</Badge>
+                )}
+              </Button>
+            </Link>
+            <Link href="/dashboard/parent-portal/documents">
+              <Button variant="outline" className="h-20 flex flex-col gap-2">
+                <FileText className="w-6 h-6" />
+                Upload Document
+              </Button>
+            </Link>
+            <Link href="/dashboard/parent-portal/academics">
+              <Button variant="outline" className="h-20 flex flex-col gap-2">
+                <BookOpen className="w-6 h-6" />
+                View Report Card
+              </Button>
+            </Link>
             <Button variant="outline" className="h-20 flex flex-col gap-2">
-              <FileText className="w-6 h-6" />
+              <Calendar className="w-6 h-6" />
               Download Timetable
             </Button>
           </div>

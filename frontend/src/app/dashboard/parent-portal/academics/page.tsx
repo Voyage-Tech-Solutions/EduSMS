@@ -3,22 +3,33 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Download, TrendingUp, TrendingDown } from "lucide-react";
+import { Download, TrendingUp, TrendingDown, GraduationCap } from "lucide-react";
 
 export default function ParentAcademicsPage() {
   const [academics, setAcademics] = useState<any>({ subjects: [], assessments: [] });
+  const [children, setChildren] = useState<any[]>([]);
+  const [selectedChild, setSelectedChild] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAcademics();
+    fetch("/api/v1/parent/children")
+      .then(res => res.json())
+      .then(data => {
+        setChildren(data.children || []);
+        if (data.children?.length > 0) setSelectedChild(data.children[0].student_id);
+      });
   }, []);
 
+  useEffect(() => {
+    if (selectedChild) fetchAcademics();
+  }, [selectedChild]);
+
   const fetchAcademics = async () => {
-    const studentId = "student-id"; // Get from context
-    const response = await fetch(`/api/v1/parent/academics?student_id=${studentId}`);
+    const response = await fetch(`/api/v1/parent/academics?student_id=${selectedChild}`);
     const data = await response.json();
     setAcademics(data);
     setLoading(false);
@@ -33,10 +44,29 @@ export default function ParentAcademicsPage() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Academic Performance</h1>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <GraduationCap className="w-8 h-8" />
+            Academic Performance
+          </h1>
           <p className="text-muted-foreground">Track your child's academic progress</p>
         </div>
-        <Button><Download className="w-4 h-4 mr-2" />Download Report Card</Button>
+        <div className="flex gap-2">
+          {children.length > 1 && (
+            <Select value={selectedChild} onValueChange={setSelectedChild}>
+              <SelectTrigger className="w-64">
+                <SelectValue placeholder="Select Child" />
+              </SelectTrigger>
+              <SelectContent>
+                {children.map((child) => (
+                  <SelectItem key={child.student_id} value={child.student_id}>
+                    {child.student_name} - {child.grade_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Button><Download className="w-4 h-4 mr-2" />Download Report Card</Button>
+        </div>
       </div>
 
       {/* Overall Summary */}

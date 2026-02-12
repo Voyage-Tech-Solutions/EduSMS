@@ -3,25 +3,36 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, FileText, Clock } from "lucide-react";
+import { Upload, FileText, Clock, BookOpen } from "lucide-react";
 
 export default function ParentAssignmentsPage() {
   const [assignments, setAssignments] = useState<any>([]);
+  const [children, setChildren] = useState<any[]>([]);
+  const [selectedChild, setSelectedChild] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAssignments();
+    fetch("/api/v1/parent/children")
+      .then(res => res.json())
+      .then(data => {
+        setChildren(data.children || []);
+        if (data.children?.length > 0) setSelectedChild(data.children[0].student_id);
+      });
   }, []);
 
+  useEffect(() => {
+    if (selectedChild) fetchAssignments();
+  }, [selectedChild]);
+
   const fetchAssignments = async () => {
-    const studentId = "student-id";
-    const response = await fetch(`/api/v1/parent/assignments?student_id=${studentId}`);
+    const response = await fetch(`/api/v1/parent/assignments?student_id=${selectedChild}`);
     const data = await response.json();
     setAssignments(data.assignments || []);
     setLoading(false);
@@ -39,9 +50,28 @@ export default function ParentAssignmentsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Assignments & Homework</h1>
-        <p className="text-muted-foreground">Track and submit assignments</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <BookOpen className="w-8 h-8" />
+            Assignments & Homework
+          </h1>
+          <p className="text-muted-foreground">Track and submit assignments</p>
+        </div>
+        {children.length > 1 && (
+          <Select value={selectedChild} onValueChange={setSelectedChild}>
+            <SelectTrigger className="w-64">
+              <SelectValue placeholder="Select Child" />
+            </SelectTrigger>
+            <SelectContent>
+              {children.map((child) => (
+                <SelectItem key={child.student_id} value={child.student_id}>
+                  {child.student_name} - {child.grade_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -184,15 +214,23 @@ function AssignmentDetailsDialog({ assignment }: any) {
 function SubmitAssignmentDialog({ assignment, onSuccess }: any) {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState("");
+  const [selectedChild, setSelectedChild] = useState("");
+
+  useEffect(() => {
+    fetch("/api/v1/parent/children")
+      .then(res => res.json())
+      .then(data => {
+        if (data.children?.length > 0) setSelectedChild(data.children[0].student_id);
+      });
+  }, []);
 
   const handleSubmit = async () => {
-    const studentId = "student-id";
     await fetch("/api/v1/parent/assignments/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         assignment_id: assignment.id,
-        student_id: studentId,
+        student_id: selectedChild,
         submission_url: file
       }),
     });

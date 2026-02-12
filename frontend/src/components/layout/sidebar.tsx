@@ -61,11 +61,16 @@ const teacherNavItems: NavItem[] = [
 ];
 
 const parentNavItems: NavItem[] = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'My Children', href: '/dashboard/children', icon: Users },
-    { title: 'Fees & Payments', href: '/dashboard/fees', icon: CreditCard },
-    { title: 'Messages', href: '/dashboard/messages', icon: Bell },
-    { title: 'Announcements', href: '/dashboard/announcements', icon: Bell },
+    { title: 'Home', href: '/dashboard/parent-portal', icon: LayoutDashboard },
+    { title: 'My Children', href: '/dashboard/parent-portal/children', icon: Users },
+    { title: 'Attendance', href: '/dashboard/parent-portal/attendance', icon: CalendarCheck },
+    { title: 'Academics', href: '/dashboard/parent-portal/academics', icon: GraduationCap },
+    { title: 'Assignments', href: '/dashboard/parent-portal/assignments', icon: BookOpen },
+    { title: 'Fees & Payments', href: '/dashboard/parent-portal/fees', icon: CreditCard },
+    { title: 'Documents', href: '/dashboard/parent-portal/documents', icon: FileText },
+    { title: 'Messages', href: '/dashboard/parent-portal/messages', icon: Bell },
+    { title: 'School Notices', href: '/dashboard/parent-portal/notices', icon: Bell },
+    { title: 'Profile', href: '/dashboard/parent-portal/profile', icon: Settings },
 ];
 
 

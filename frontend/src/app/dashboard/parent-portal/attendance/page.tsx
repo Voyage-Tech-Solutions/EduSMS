@@ -9,13 +9,24 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CheckCircle, XCircle, Clock, AlertCircle, CalendarCheck } from "lucide-react";
 
 export default function ParentAttendancePage() {
   const [attendance, setAttendance] = useState<any>({ attendance: [], stats: {} });
+  const [children, setChildren] = useState<any[]>([]);
   const [selectedChild, setSelectedChild] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/v1/parent/children")
+      .then(res => res.json())
+      .then(data => {
+        setChildren(data.children || []);
+        if (data.children?.length > 0) setSelectedChild(data.children[0].student_id);
+      });
+  }, []);
 
   useEffect(() => {
     if (selectedChild) fetchAttendance();
@@ -53,10 +64,29 @@ export default function ParentAttendancePage() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Attendance</h1>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <CalendarCheck className="w-8 h-8" />
+            Attendance
+          </h1>
           <p className="text-muted-foreground">Track your child's attendance</p>
         </div>
-        <ReportAbsenceDialog studentId={selectedChild} onSuccess={fetchAttendance} />
+        <div className="flex gap-2">
+          {children.length > 1 && (
+            <Select value={selectedChild} onValueChange={setSelectedChild}>
+              <SelectTrigger className="w-64">
+                <SelectValue placeholder="Select Child" />
+              </SelectTrigger>
+              <SelectContent>
+                {children.map((child) => (
+                  <SelectItem key={child.student_id} value={child.student_id}>
+                    {child.student_name} - {child.grade_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <ReportAbsenceDialog studentId={selectedChild} onSuccess={fetchAttendance} />
+        </div>
       </div>
 
       {/* Stats Cards */}

@@ -20,36 +20,53 @@ export default function PrincipalStaffPage() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
-    const res = await fetch("/api/v1/principal-dashboard/staff");
-    setStaff(await res.json());
+    try {
+      const res = await fetch("/api/v1/principal-dashboard/staff");
+      if (res.ok) {
+        setStaff(await res.json());
+      } else {
+        setStaff([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch staff:", error);
+      setStaff([]);
+    }
   };
 
   const handleAddStaff = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    await fetch("/api/v1/staff", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        first_name: formData.get("first_name"),
-        last_name: formData.get("last_name"),
-        email: formData.get("email"),
-        phone: formData.get("phone"),
-        role: formData.get("role")
-      })
-    });
-    setShowAddModal(false);
-    fetchData();
+    try {
+      const formData = new FormData(e.currentTarget);
+      await fetch("/api/v1/staff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: formData.get("first_name"),
+          last_name: formData.get("last_name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          role: formData.get("role")
+        })
+      });
+      setShowAddModal(false);
+      fetchData();
+    } catch (error) {
+      console.error("Failed to add staff:", error);
+    }
   };
 
   const handleDeactivate = async () => {
-    await fetch(`/api/v1/principal-dashboard/staff/${selectedStaff.id}/deactivate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reason: "Principal deactivation" })
-    });
-    setShowDeactivateModal(false);
-    fetchData();
+    try {
+      await fetch(`/api/v1/principal-dashboard/staff/${selectedStaff.id}/deactivate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "Principal deactivation" })
+      });
+      setShowDeactivateModal(false);
+      fetchData();
+    } catch (error) {
+      console.error("Failed to deactivate staff:", error);
+    }
   };
 
   return (

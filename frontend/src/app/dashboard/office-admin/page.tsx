@@ -1,28 +1,20 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
-    ClipboardCheck,
-    DollarSign,
-    Users,
-    FileText,
-    AlertTriangle,
-    CheckCircle,
+    ClipboardCheck, DollarSign, Users, FileText, AlertTriangle, CheckCircle, Loader2
 } from 'lucide-react';
 import {
-    SaveAttendanceModal,
-    CreateInvoiceModal,
-    AddStudentModal,
-    AddStaffModal,
-    BulkReminderModal
-} from './office-modals';
+    SaveAttendanceModal, CreateInvoiceModal, AddStudentModal, AddStaffModal, BulkReminderModal
+} from '@/components/dashboard/office-modals';
 
-export function OfficeAdminDashboard() {
+export default function OfficeAdminDashboard() {
+    const router = useRouter();
     const [priorities, setPriorities] = useState<any>(null);
     const [fees, setFees] = useState<any>(null);
     const [students, setStudents] = useState<any>(null);
@@ -46,7 +38,6 @@ export function OfficeAdminDashboard() {
             const { getSession } = await import('@/lib/supabase');
             const session = await getSession();
             if (!session?.access_token) {
-                console.error('No auth session found');
                 setLoading(false);
                 return;
             }
@@ -78,24 +69,19 @@ export function OfficeAdminDashboard() {
 
     if (loading) {
         return (
-            <div className="space-y-6">
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="mt-4 text-slate-500">Loading dashboard...</p>
-                    </div>
-                </div>
+            <div className="flex items-center justify-center h-64">
+                <Loader2 className="h-12 w-12 animate-spin text-emerald-600" />
             </div>
         );
     }
 
     const priorityTasks = [
-        { task: 'Admissions awaiting document verification', count: priorities?.admissions_pending || 0 },
-        { task: 'Students with missing documents', count: priorities?.missing_documents || 0 },
-        { task: 'Fee payments to allocate', count: priorities?.payments_to_allocate || 0 },
-        { task: 'Proof of payment uploads', count: priorities?.proof_uploads || 0 },
-        { task: 'Transfer requests pending', count: priorities?.transfer_requests || 0 },
-        { task: 'Letters requested', count: priorities?.letters_requested || 0 },
+        { task: 'Admissions awaiting document verification', count: priorities?.admissions_pending || 0, action: () => router.push('/dashboard/office-admin/admissions?filter=pending_verification') },
+        { task: 'Students with missing documents', count: priorities?.missing_documents || 0, action: () => router.push('/dashboard/office-admin/students?filter=missing_docs') },
+        { task: 'Fee payments to allocate', count: priorities?.payments_to_allocate || 0, action: () => router.push('/dashboard/office-admin/fees?filter=unallocated') },
+        { task: 'Proof of payment uploads', count: priorities?.proof_uploads || 0, action: () => router.push('/dashboard/office-admin/fees?filter=verify_proof') },
+        { task: 'Transfer requests pending', count: priorities?.transfer_requests || 0, action: () => router.push('/dashboard/office-admin/students?filter=transfers') },
+        { task: 'Letters requested', count: priorities?.letters_requested || 0, action: () => router.push('/dashboard/office-admin/documents?filter=letters') },
     ];
 
     return (
@@ -132,7 +118,7 @@ export function OfficeAdminDashboard() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button size="sm" disabled={task.count === 0}>
+                                        <Button size="sm" disabled={task.count === 0} onClick={task.action}>
                                             {task.task.includes('awaiting') ? 'Review' : 
                                              task.task.includes('missing') ? 'Follow Up' : 
                                              task.task.includes('allocate') ? 'Process' : 
@@ -235,16 +221,16 @@ export function OfficeAdminDashboard() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard/reports?type=student-directory'}>
+                        <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/reports?type=student-directory')}>
                             Student Directory
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard/reports?type=fee-statement'}>
+                        <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/reports?type=fee-statement')}>
                             Fee Statement
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard/reports?type=attendance-summary'}>
+                        <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/reports?type=attendance-summary')}>
                             Attendance Summary
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard/reports?type=grade-report'}>
+                        <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/reports?type=grade-report')}>
                             Grade Report
                         </Button>
                     </div>

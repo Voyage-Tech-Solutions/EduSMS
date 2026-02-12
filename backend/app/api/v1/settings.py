@@ -1,112 +1,95 @@
-"""
-EduCore Backend - School Settings API
-"""
-from fastapi import APIRouter, HTTPException, status, Depends
-from typing import Dict, Any
-from datetime import datetime
-from app.core.security import require_office_admin
-from app.db.supabase import supabase_admin
+from fastapi import APIRouter, Depends
+from typing import Optional
+from pydantic import BaseModel
+from app.core.auth import get_current_user, get_user_school_id
+from app.db.supabase_client import get_supabase_client
 
-router = APIRouter(prefix="/settings", tags=["Settings"])
+router = APIRouter()
 
+class SchoolSettingsUpdate(BaseModel):
+    name: Optional[str] = None
+    code: Optional[str] = None
+    logo_url: Optional[str] = None
+    primary_color: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    timezone: Optional[str] = None
+    currency: Optional[str] = None
+    country: Optional[str] = None
+
+class AttendanceSettingsUpdate(BaseModel):
+    allow_future_dates: Optional[bool] = None
+    late_cutoff_time: Optional[str] = None
+    excused_requires_note: Optional[bool] = None
+    default_status: Optional[str] = None
+    auto_mark_absent: Optional[bool] = None
+
+class BillingSettingsUpdate(BaseModel):
+    invoice_prefix: Optional[str] = None
+    default_due_days: Optional[int] = None
+    allow_overpayment: Optional[bool] = None
+    require_payment_proof: Optional[bool] = None
+    collection_target: Optional[float] = None
 
 @router.get("/school")
-async def get_school_settings(current_user: dict = Depends(require_office_admin)):
-    """Get school information and settings"""
-    school_id = current_user.get("school_id")
-    if supabase_admin:
-        school = supabase_admin.table("schools").select("*").eq("id", school_id).execute()
-        settings = supabase_admin.table("school_settings").select("*").eq("school_id", school_id).execute()
-        return {"school": school.data[0] if school.data else {}, "settings": settings.data[0] if settings.data else {}}
-    return {"school": {}, "settings": {}}
-
+async def get_school_settings(
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    school_id = get_user_school_id(user)
+    result = supabase.table("school_settings").select("*").eq("school_id", school_id).single().execute()
+    return result.data
 
 @router.patch("/school")
-async def update_school_settings(update_data: Dict[str, Any], current_user: dict = Depends(require_office_admin)):
-    """Update school information"""
-    school_id = current_user.get("school_id")
-    user_id = current_user.get("id")
-    
-    school_data = {k: v for k, v in update_data.items() if k in ["name", "address", "phone", "email", "website", "logo_url"]}
-    settings_data = {k: v for k, v in update_data.items() if k in ["timezone", "currency", "country", "primary_color"]}
-    
-    if supabase_admin:
-        if school_data:
-            supabase_admin.table("schools").update(school_data).eq("id", school_id).execute()
-        if settings_data:
-            settings_data["updated_by"] = user_id
-            supabase_admin.table("school_settings").upsert({"school_id": school_id, **settings_data}).execute()
-        return {"success": True}
-    return {"success": False}
-
+async def update_school_settings(
+    settings: SchoolSettingsUpdate,
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    school_id = get_user_school_id(user)
+    data = {k: v for k, v in settings.dict().items() if v is not None}
+    data["updated_by"] = user["id"]
+    result = supabase.table("school_settings").update(data).eq("school_id", school_id).execute()
+    return result.data[0]
 
 @router.get("/attendance")
-async def get_attendance_settings(current_user: dict = Depends(require_office_admin)):
-    """Get attendance rules"""
-    school_id = current_user.get("school_id")
-    if supabase_admin:
-        result = supabase_admin.table("school_settings").select("allow_future_attendance, late_cutoff_time").eq("school_id", school_id).execute()
-        return result.data[0] if result.data else {}
-    return {}
-
+async def get_attendance_settings(
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    school_id = get_user_school_id(user)
+    result = supabase.table("attendance_settings").select("*").eq("school_id", school_id).single().execute()
+    return result.data
 
 @router.patch("/attendance")
-async def update_attendance_settings(update_data: Dict[str, Any], current_user: dict = Depends(require_office_admin)):
-    """Update attendance rules"""
-    school_id = current_user.get("school_id")
-    user_id = current_user.get("id")
-    update_data["updated_by"] = user_id
-    if supabase_admin:
-        supabase_admin.table("school_settings").upsert({"school_id": school_id, **update_data}).execute()
-        return {"success": True}
-    return {"success": False}
-
+async def update_attendance_settings(
+    settings: AttendanceSettingsUpdate,
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    school_id = get_user_school_id(user)
+    data = {k: v for k, v in settings.dict().items() if v is not None}
+    result = supabase.table("attendance_settings").update(data).eq("school_id", school_id).execute()
+    return result.data[0]
 
 @router.get("/billing")
-async def get_billing_settings(current_user: dict = Depends(require_office_admin)):
-    """Get billing settings"""
-    school_id = current_user.get("school_id")
-    if supabase_admin:
-        result = supabase_admin.table("school_settings").select("invoice_prefix, invoice_next_number, default_due_days, allow_overpayment").eq("school_id", school_id).execute()
-        return result.data[0] if result.data else {}
-    return {}
-
+async def get_billing_settings(
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    school_id = get_user_school_id(user)
+    result = supabase.table("billing_settings").select("*").eq("school_id", school_id).single().execute()
+    return result.data
 
 @router.patch("/billing")
-async def update_billing_settings(update_data: Dict[str, Any], current_user: dict = Depends(require_office_admin)):
-    """Update billing settings"""
-    school_id = current_user.get("school_id")
-    user_id = current_user.get("id")
-    update_data["updated_by"] = user_id
-    if supabase_admin:
-        supabase_admin.table("school_settings").upsert({"school_id": school_id, **update_data}).execute()
-        return {"success": True}
-    return {"success": False}
-
-
-@router.get("/notifications")
-async def get_notification_settings(current_user: dict = Depends(require_office_admin)):
-    """Get notification settings"""
-    school_id = current_user.get("school_id")
-    if supabase_admin:
-        result = supabase_admin.table("school_settings").select("sms_enabled, email_enabled").eq("school_id", school_id).execute()
-        return result.data[0] if result.data else {}
-    return {}
-
-
-@router.patch("/notifications")
-async def update_notification_settings(update_data: Dict[str, Any], current_user: dict = Depends(require_office_admin)):
-    """Update notification settings"""
-    school_id = current_user.get("school_id")
-    user_id = current_user.get("id")
-    update_data["updated_by"] = user_id
-    if supabase_admin:
-        supabase_admin.table("school_settings").upsert({"school_id": school_id, **update_data}).execute()
-        return {"success": True}
-    return {"success": False}
-
-
-@router.post("/notifications/test")
-async def test_notification(test_data: Dict[str, Any], current_user: dict = Depends(require_office_admin)):
-    """Send test notification"""
-    return {"message": "Test notification sent", "type": test_data.get("type", "email")}
+async def update_billing_settings(
+    settings: BillingSettingsUpdate,
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    school_id = get_user_school_id(user)
+    data = {k: v for k, v in settings.dict().items() if v is not None}
+    result = supabase.table("billing_settings").update(data).eq("school_id", school_id).execute()
+    return result.data[0]

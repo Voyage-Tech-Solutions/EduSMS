@@ -22,6 +22,24 @@ export default function DashboardPage() {
         );
     }
 
+    // Redirect to role-specific dashboard
+    React.useEffect(() => {
+        if (!isLoading && profile?.role) {
+            const roleRoutes: Record<string, string> = {
+                'system_admin': '/dashboard/system-admin',
+                'principal': '/dashboard/principal',
+                'office_admin': '/dashboard/office-admin',
+                'teacher': '/dashboard/teacher',
+                'parent': '/dashboard/parent-portal',
+            };
+            
+            const route = roleRoutes[profile.role];
+            if (route && window.location.pathname === '/dashboard') {
+                window.location.href = route;
+            }
+        }
+    }, [profile, isLoading]);
+
     const renderDashboard = () => {
         switch (profile?.role) {
             case 'system_admin':

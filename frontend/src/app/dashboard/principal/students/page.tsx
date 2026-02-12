@@ -1,40 +1,70 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Download, Flag, Mail, Edit } from "lucide-react";
+import { Users, AlertTriangle, TrendingDown, UserX, Download, Flag } from "lucide-react";
 
 export default function PrincipalStudentsPage() {
-  const [students, setStudents] = useState<any>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>({});
-  const [filters, setFilters] = useState({ search: "", status: "", risk_level: "" });
-  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({ search: "", grade: "", status: "active", risk: "" });
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
+  const [interventionModal, setInterventionModal] = useState(false);
+  const [statusModal, setStatusModal] = useState(false);
+  const [notifyModal, setNotifyModal] = useState(false);
 
   useEffect(() => {
+    fetchSummary();
     fetchStudents();
   }, [filters]);
 
-  const fetchStudents = async () => {
-    setLoading(true);
-    const params = new URLSearchParams(filters);
-    const response = await fetch(`/api/v1/principal/students?${params}`);
-    const data = await response.json();
-    setStudents(data.students || []);
-    setSummary(data.summary || {});
-    setLoading(false);
+  const fetchSummary = async () => {
+    const res = await fetch("/api/v1/principal/students/summary");
+    const data = await res.json();
+    setSummary(data);
   };
 
-  const getRiskBadge = (risk: string) => {
-    if (!risk) return <Badge variant="outline">None</Badge>;
-    const colors: any = { attendance: "bg-orange-500", academic: "bg-red-500", financial: "bg-yellow-500" };
-    return <Badge className={colors[risk]}>{risk}</Badge>;
+  const fetchStudents = async () => {
+    const params = new URLSearchParams(filters as any);
+    const res = await fetch(`/api/v1/principal/students?${params}`);
+    const data = await res.json();
+    setStudents(data);
+  };
+
+  const handleFlagIntervention = async (data: any) => {
+    await fetch("/api/v1/principal/students/risk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...data, student_id: selectedStudent.id })
+    });
+    setInterventionModal(false);
+    fetchStudents();
+  };
+
+  const handleChangeStatus = async (data: any) => {
+    await fetch(`/api/v1/principal/students/${selectedStudent.id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    setStatusModal(false);
+    fetchStudents();
+  };
+
+  const getRiskBadge = (student: any) => {
+    const risks = [];
+    if (student.attendance_rate < 75) risks.push("Attendance");
+    if (student.academic_avg < 50) risks.push("Academic");
+    if (student.outstanding > 0) risks.push("Finance");
+    if (risks.length === 0) return <span className="text-green-600">None</span>;
+    if (risks.length > 1) return <span className="text-red-600 font-semibold">Multi-risk</span>;
+    return <span className="text-orange-600">{risks[0]}</span>;
   };
 
   return (
@@ -42,146 +72,214 @@ export default function PrincipalStudentsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Students</h1>
-          <p className="text-muted-foreground">Monitor student population health</p>
+          <p className="text-gray-600">Monitor student population health and risks</p>
         </div>
-        <Button variant="outline"><Download className="w-4 h-4 mr-2" />Export</Button>
+        <div className="flex gap-2">
+          <Button variant="outline"><Download className="w-4 h-4 mr-2" />Export</Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        {[
-          { label: "Total", value: summary.total || 0, color: "" },
-          { label: "Active", value: summary.active || 0, color: "text-green-600" },
-          { label: "Inactive", value: summary.inactive || 0, color: "text-gray-600" },
-          { label: "Transferred", value: summary.transferred || 0, color: "text-blue-600" },
-          { label: "At Risk", value: summary.at_risk || 0, color: "text-red-600" },
-          { label: "Chronic Absent", value: summary.chronic_absentees || 0, color: "text-orange-600" },
-          { label: "Below Pass", value: summary.academic_below_pass || 0, color: "text-red-600" },
-        ].map((card, i) => (
-          <Card key={i} className="cursor-pointer hover:bg-accent">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">{card.label}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${card.color}`}>{card.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input placeholder="Search name or admission #" value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} />
-            <Select value={filters.status} onValueChange={(v) => setFilters({ ...filters, status: v })}>
-              <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filters.risk_level} onValueChange={(v) => setFilters({ ...filters, risk_level: v })}>
-              <SelectTrigger><SelectValue placeholder="Risk Level" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All Risk</SelectItem>
-                <SelectItem value="attendance">Attendance</SelectItem>
-                <SelectItem value="academic">Academic</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={() => setFilters({ search: "", status: "", risk_level: "" })}>Clear</Button>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="p-4 cursor-pointer" onClick={() => setFilters({...filters, status: "active"})}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total Students</p>
+              <p className="text-3xl font-bold">{summary.total || 0}</p>
+            </div>
+            <Users className="w-10 h-10 text-blue-500" />
           </div>
-        </CardContent>
+        </Card>
+
+        <Card className="p-4 cursor-pointer bg-orange-50" onClick={() => setFilters({...filters, risk: "any"})}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Students At Risk</p>
+              <p className="text-3xl font-bold text-orange-600">{summary.at_risk || 0}</p>
+            </div>
+            <AlertTriangle className="w-10 h-10 text-orange-500" />
+          </div>
+        </Card>
+
+        <Card className="p-4 cursor-pointer" onClick={() => setFilters({...filters, risk: "attendance"})}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Chronic Absentees</p>
+              <p className="text-3xl font-bold">{summary.chronic_absent || 0}</p>
+            </div>
+            <TrendingDown className="w-10 h-10 text-red-500" />
+          </div>
+        </Card>
+
+        <Card className="p-4 cursor-pointer" onClick={() => setFilters({...filters, status: "inactive"})}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Inactive</p>
+              <p className="text-3xl font-bold">{summary.inactive || 0}</p>
+            </div>
+            <UserX className="w-10 h-10 text-gray-500" />
+          </div>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <Card className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <Input placeholder="Search name or admission #" value={filters.search} onChange={(e) => setFilters({...filters, search: e.target.value})} />
+          <Select value={filters.grade} onValueChange={(val) => setFilters({...filters, grade: val})}>
+            <SelectTrigger><SelectValue placeholder="All Grades" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Grades</SelectItem>
+              <SelectItem value="grade1">Grade 1</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filters.status} onValueChange={(val) => setFilters({...filters, status: val})}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="transferred">Transferred</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filters.risk} onValueChange={(val) => setFilters({...filters, risk: val})}>
+            <SelectTrigger><SelectValue placeholder="All Risk Levels" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Risk Levels</SelectItem>
+              <SelectItem value="any">Any Risk</SelectItem>
+              <SelectItem value="attendance">Attendance Risk</SelectItem>
+              <SelectItem value="academic">Academic Risk</SelectItem>
+              <SelectItem value="finance">Finance Risk</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={fetchStudents}>Apply Filters</Button>
+        </div>
       </Card>
 
+      {/* Students Table */}
       <Card>
-        <CardContent className="pt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Admission #</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Attendance %</TableHead>
-                <TableHead>Academic Avg</TableHead>
-                <TableHead>Outstanding</TableHead>
-                <TableHead>Risk</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow><TableCell colSpan={9} className="text-center">Loading...</TableCell></TableRow>
-              ) : students.length === 0 ? (
-                <TableRow><TableCell colSpan={9} className="text-center">No students found</TableCell></TableRow>
-              ) : (
-                students.map((student: any) => (
-                  <TableRow key={student.id}>
-                    <TableCell>{student.admission_number}</TableCell>
-                    <TableCell className="font-medium">{student.name}</TableCell>
-                    <TableCell>{student.grade}</TableCell>
-                    <TableCell><Badge variant={student.status === "active" ? "default" : "secondary"}>{student.status}</Badge></TableCell>
-                    <TableCell>{student.attendance_percentage}%</TableCell>
-                    <TableCell>{student.academic_average}%</TableCell>
-                    <TableCell>${student.outstanding_fees}</TableCell>
-                    <TableCell>{getRiskBadge(student.risk_level)}</TableCell>
-                    <TableCell><StudentActions student={student} onUpdate={fetchStudents} /></TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="p-3 text-left">Admission #</th>
+                <th className="p-3 text-left">Name</th>
+                <th className="p-3 text-left">Grade</th>
+                <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Attendance %</th>
+                <th className="p-3 text-left">Academic Avg</th>
+                <th className="p-3 text-left">Outstanding</th>
+                <th className="p-3 text-left">Risk</th>
+                <th className="p-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((student) => (
+                <tr key={student.id} className="border-t hover:bg-gray-50">
+                  <td className="p-3">{student.admission_number}</td>
+                  <td className="p-3 font-medium">{student.first_name} {student.last_name}</td>
+                  <td className="p-3">{student.grade_name}</td>
+                  <td className="p-3">
+                    <span className={`px-2 py-1 rounded text-xs ${student.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {student.status}
+                    </span>
+                  </td>
+                  <td className="p-3">{student.attendance_rate || 0}%</td>
+                  <td className="p-3">{student.academic_avg || 'N/A'}</td>
+                  <td className="p-3">${student.outstanding || 0}</td>
+                  <td className="p-3">{getRiskBadge(student)}</td>
+                  <td className="p-3">
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => { setSelectedStudent(student); setInterventionModal(true); }}>
+                        <Flag className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setSelectedStudent(student); setStatusModal(true); }}>
+                        Status
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
+
+      {/* Flag Intervention Modal */}
+      <Dialog open={interventionModal} onOpenChange={setInterventionModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Flag for Intervention</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); const formData = new FormData(e.currentTarget); handleFlagIntervention(Object.fromEntries(formData)); }} className="space-y-4">
+            <div>
+              <Label>Risk Type</Label>
+              <Select name="risk_type" required>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="attendance">Attendance</SelectItem>
+                  <SelectItem value="academic">Academic</SelectItem>
+                  <SelectItem value="financial">Financial</SelectItem>
+                  <SelectItem value="behavioral">Behavioral</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Severity</Label>
+              <Select name="severity" required>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Notes</Label>
+              <Textarea name="notes" required />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setInterventionModal(false)}>Cancel</Button>
+              <Button type="submit">Create Intervention</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Status Modal */}
+      <Dialog open={statusModal} onOpenChange={setStatusModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Student Status</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); const formData = new FormData(e.currentTarget); handleChangeStatus(Object.fromEntries(formData)); }} className="space-y-4">
+            <div>
+              <Label>New Status</Label>
+              <Select name="status" required>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="transferred">Transferred</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Reason</Label>
+              <Textarea name="reason" required />
+            </div>
+            <div>
+              <Label>Effective Date</Label>
+              <Input type="date" name="effective_date" required />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setStatusModal(false)}>Cancel</Button>
+              <Button type="submit">Update Status</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
-  );
-}
-
-function StudentActions({ student, onUpdate }: any) {
-  const [open, setOpen] = useState(false);
-  const [intervention, setIntervention] = useState({ risk_type: "attendance", severity: "medium", notes: "" });
-
-  const handleFlag = async () => {
-    await fetch("/api/v1/principal/students/risk", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ student_id: student.id, ...intervention }),
-    });
-    setOpen(false);
-    onUpdate();
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">Actions</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader><DialogTitle>Actions - {student.name}</DialogTitle></DialogHeader>
-        <div className="space-y-4">
-          <div className="border p-4 rounded space-y-3">
-            <h3 className="font-semibold flex items-center gap-2"><Flag className="w-4 h-4" />Flag Intervention</h3>
-            <Select value={intervention.risk_type} onValueChange={(v) => setIntervention({ ...intervention, risk_type: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="attendance">Attendance</SelectItem>
-                <SelectItem value="academic">Academic</SelectItem>
-                <SelectItem value="financial">Financial</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={intervention.severity} onValueChange={(v) => setIntervention({ ...intervention, severity: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-              </SelectContent>
-            </Select>
-            <Textarea placeholder="Notes" value={intervention.notes} onChange={(e) => setIntervention({ ...intervention, notes: e.target.value })} />
-            <Button onClick={handleFlag} className="w-full">Flag</Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }

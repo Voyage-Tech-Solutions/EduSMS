@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,6 +57,7 @@ export function SaveAttendanceModal({ open, onClose, onSuccess }: any) {
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Save Attendance</DialogTitle>
+                    <DialogDescription>Record attendance for students in the selected class.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div>
@@ -154,6 +155,7 @@ export function CreateInvoiceModal({ open, onClose, onSuccess }: any) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create Invoice</DialogTitle>
+                    <DialogDescription>Generate a new fee invoice for a student.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div>
@@ -262,6 +264,7 @@ export function AddStudentModal({ open, onClose, onSuccess }: any) {
             <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Add Student</DialogTitle>
+                    <DialogDescription>Register a new student with their details and parent information.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div className="font-semibold">Basic Information</div>
@@ -389,6 +392,7 @@ export function AddStaffModal({ open, onClose, onSuccess }: any) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Add Staff</DialogTitle>
+                    <DialogDescription>Send an invitation to a new staff member.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div>
@@ -484,6 +488,7 @@ export function BulkReminderModal({ open, onClose, onSuccess }: any) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Send Bulk Reminder</DialogTitle>
+                    <DialogDescription>Send reminders to multiple parents about missing documents or fees.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                     <div>

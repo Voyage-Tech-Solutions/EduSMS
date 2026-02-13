@@ -54,8 +54,11 @@ async def get_current_user(
     token = credentials.credentials
     
     try:
-        # Verify token with Supabase
-        supabase = get_supabase_client()
+        # Use admin client to verify token
+        from app.db.supabase import get_supabase_admin
+        supabase = get_supabase_admin()
+        
+        # Verify token with Supabase admin client
         user_response = supabase.auth.get_user(token)
         user = user_response.user
         
@@ -69,12 +72,11 @@ async def get_current_user(
         profile_response = supabase.table("user_profiles").select("*").eq("id", user.id).single().execute()
         
         if not profile_response.data:
-             # Fallback for users without profile (should not happen in normal flow)
-             # Or could return a default role if needed
+             # Fallback for users without profile
              return {
                 "id": user.id,
                 "email": user.email,
-                "role": "student", # Default or error
+                "role": "student",
                 "school_id": None
              }
              
@@ -87,6 +89,8 @@ async def get_current_user(
             "school_id": profile["school_id"],
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Auth Error: {str(e)}")
         raise HTTPException(

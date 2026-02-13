@@ -2,22 +2,15 @@
  * Authenticated fetch wrapper.
  * Drop-in replacement for fetch() that automatically injects
  * the Supabase JWT as an Authorization: Bearer header.
+ *
+ * URLs are kept as-is (relative paths like /api/v1/... go through
+ * the Next.js rewrite proxy, avoiding CORS entirely).
  */
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 export async function authFetch(
   input: string,
   init?: RequestInit
 ): Promise<Response> {
-  // Rewrite relative /api/v1/ paths to the backend base URL
-  let url = input;
-  if (url.startsWith('/api/v1/')) {
-    url = `${API_BASE_URL}${url.slice(7)}`;
-  } else if (url.startsWith('/api/v1')) {
-    url = API_BASE_URL;
-  }
-
   // Get auth token from Supabase session
   let authHeader: Record<string, string> = {};
   try {
@@ -39,7 +32,7 @@ export async function authFetch(
         : (init.headers as Record<string, string>)
     : {};
 
-  return fetch(url, {
+  return fetch(input, {
     ...init,
     headers: {
       ...authHeader,

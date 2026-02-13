@@ -3,11 +3,11 @@ import { ArrowRight, CheckCircle, Shield, Users, TrendingUp } from "lucide-react
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="text-2xl font-semibold">EduCore</div>
+          <div className="text-2xl font-semibold text-emerald-700">EduCore</div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
             <a href="#how-it-works" className="text-gray-600 hover:text-gray-900">How it works</a>
@@ -26,7 +26,7 @@ export default function LandingPage() {
           Manage students, attendance, fees, and academic records through a single, structured system designed for schools.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-          <Link href="/signup" className="px-8 py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-medium">
+          <Link href="/signup" className="px-8 py-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium">
             Get Started
           </Link>
           <Link href="/demo" className="px-8 py-4 border border-gray-300 rounded-lg hover:border-gray-400 font-medium">
@@ -37,7 +37,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="bg-gray-50 py-24">
+      <section id="features" className="bg-white py-24">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-16">
             Everything your school needs to operate efficiently
@@ -91,25 +91,25 @@ export default function LandingPage() {
           </h2>
           <div className="max-w-3xl mx-auto space-y-6 mt-12">
             <div className="flex gap-4">
-              <CheckCircle className="w-6 h-6 text-gray-900 flex-shrink-0 mt-1" />
+              <CheckCircle className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" />
               <div>
                 <p className="text-lg">Admin staff manage admissions, documents, and billing</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <CheckCircle className="w-6 h-6 text-gray-900 flex-shrink-0 mt-1" />
+              <CheckCircle className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" />
               <div>
                 <p className="text-lg">Teachers record attendance, grades, and assignments</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <CheckCircle className="w-6 h-6 text-gray-900 flex-shrink-0 mt-1" />
+              <CheckCircle className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" />
               <div>
                 <p className="text-lg">Principals monitor performance, reports, and approvals</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <CheckCircle className="w-6 h-6 text-gray-900 flex-shrink-0 mt-1" />
+              <CheckCircle className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" />
               <div>
                 <p className="text-lg">Parents stay informed on attendance, academics, and fees</p>
               </div>
@@ -118,55 +118,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="bg-gray-50 py-24">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-16">Used by growing schools</h2>
-          <div className="grid md:grid-cols-4 gap-12 text-center">
-            <div>
-              <div className="text-4xl font-bold mb-2">500+</div>
-              <div className="text-gray-600">Schools</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">50,000+</div>
-              <div className="text-gray-600">Students</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">99.9%</div>
-              <div className="text-gray-600">Uptime</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">24/7</div>
-              <div className="text-gray-600">Support</div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Security Section */}
-      <section id="security" className="py-24">
+      <section id="security" className="py-24 bg-emerald-50">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-6">
             Built with data protection in mind
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
             <div className="text-center">
-              <Shield className="w-12 h-12 mx-auto mb-4 text-gray-900" />
+              <Shield className="w-12 h-12 mx-auto mb-4 text-emerald-600" />
               <h3 className="font-semibold mb-2">Data Separation</h3>
               <p className="text-sm text-gray-600">School-level data isolation</p>
             </div>
             <div className="text-center">
-              <Users className="w-12 h-12 mx-auto mb-4 text-gray-900" />
+              <Users className="w-12 h-12 mx-auto mb-4 text-emerald-600" />
               <h3 className="font-semibold mb-2">Access Control</h3>
               <p className="text-sm text-gray-600">Role-based permissions</p>
             </div>
             <div className="text-center">
-              <TrendingUp className="w-12 h-12 mx-auto mb-4 text-gray-900" />
+              <TrendingUp className="w-12 h-12 mx-auto mb-4 text-emerald-600" />
               <h3 className="font-semibold mb-2">Cloud Infrastructure</h3>
               <p className="text-sm text-gray-600">Secure and scalable</p>
             </div>
             <div className="text-center">
-              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-gray-900" />
+              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-emerald-600" />
               <h3 className="font-semibold mb-2">Audit Tracking</h3>
               <p className="text-sm text-gray-600">Track key actions</p>
             </div>
@@ -175,7 +152,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-gray-900 text-white py-24">
+      <section className="bg-gradient-to-r from-emerald-700 to-green-600 text-white py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Get started with EduCore</h2>
           <p className="text-xl text-gray-300 mb-12">

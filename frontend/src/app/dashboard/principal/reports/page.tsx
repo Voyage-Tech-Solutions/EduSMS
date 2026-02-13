@@ -127,7 +127,7 @@ export default function PrincipalReportsPage() {
               <Label>Grade</Label>
               <Select name="grade">
                 <SelectTrigger><SelectValue placeholder="All Grades" /></SelectTrigger>
-                <SelectContent><SelectItem value="">All Grades</SelectItem></SelectContent>
+                <SelectContent><SelectItem value="all">All Grades</SelectItem></SelectContent>
               </Select>
             </div>
             <div className="flex gap-2 justify-end">

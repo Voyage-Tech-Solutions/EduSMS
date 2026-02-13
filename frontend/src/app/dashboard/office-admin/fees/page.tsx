@@ -161,7 +161,7 @@ export default function FeesPage() {
           <Select value={filters.status} onValueChange={(v) => setFilters({...filters, status: v})}>
             <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="unpaid">Unpaid</SelectItem>
               <SelectItem value="partial">Partial</SelectItem>
               <SelectItem value="paid">Paid</SelectItem>

@@ -3,16 +3,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { StatCard } from '@/components/dashboard';
+import { AddStudentDialog } from '@/components/dialogs/add-student-dialog';
+import { Label } from '@/components/ui/label';
 import {
-    Search, Plus, Edit, Trash2, Users, UserCheck, GraduationCap, AlertTriangle,
-    Loader2, ChevronLeft, ChevronRight,
+    Search, Plus, Edit, Trash2, Users, UserPlus, UserMinus, ArrowLeftRight,
+    Loader2, ChevronLeft, ChevronRight, FileText, Eye,
 } from 'lucide-react';
 
 interface Student {
@@ -230,11 +231,19 @@ export default function StudentsPage() {
     });
 
     const stats = {
-        total: students.length,
         active: students.filter(s => s.status === 'active').length,
-        inactive: students.filter(s => s.status === 'inactive').length,
+        newThisMonth: students.filter(s => {
+            const created = new Date(s.created_at);
+            const now = new Date();
+            return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+        }).length,
         transferred: students.filter(s => s.status === 'transferred').length,
+        inactive: students.filter(s => s.status === 'inactive' || s.status === 'graduated').length,
     };
+
+    const recentActivity = students
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 5);
 
     if (loading) {
         return <div className="flex items-center justify-center h-64"><Loader2 className="h-12 w-12 animate-spin text-emerald-600" /></div>;
@@ -308,14 +317,9 @@ export default function StudentsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Students</h1>
-                    <p className="text-slate-500 mt-1">Manage your student records</p>
-                </div>
-                <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => { resetForm(); setShowAddDialog(true); }}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Student
-                </Button>
+            <div>
+                <h1 className="text-3xl font-bold text-slate-900">Student Administration Overview</h1>
+                <p className="text-slate-500 mt-1">Current student status and recent activity</p>
             </div>
 
             {message && (
@@ -325,10 +329,42 @@ export default function StudentsPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <StatCard title="Total Students" value={stats.total} icon={Users} />
-                <StatCard title="Active" value={stats.active} icon={UserCheck} />
-                <StatCard title="Inactive" value={stats.inactive} icon={AlertTriangle} />
-                <StatCard title="Transferred" value={stats.transferred} icon={GraduationCap} />
+                <StatCard 
+                    title="Active Students" 
+                    value={stats.active} 
+                    icon={Users}
+                    description="Currently enrolled and active"
+                />
+                <StatCard 
+                    title="New Admissions (This Month)" 
+                    value={stats.newThisMonth} 
+                    icon={UserPlus}
+                    description="Students enrolled this month"
+                />
+                <StatCard 
+                    title="Pending Transfers" 
+                    value={stats.transferred} 
+                    icon={ArrowLeftRight}
+                    description="Awaiting approval or processing"
+                />
+                <StatCard 
+                    title="Inactive Students" 
+                    value={stats.inactive} 
+                    icon={UserMinus}
+                    description="Withdrawn, graduated, or suspended"
+                />
+            </div>
+
+            <div className="flex gap-3">
+                <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={() => { resetForm(); setShowAddDialog(true); }}>
+                    <Plus className="mr-2 h-4 w-4" /> Add Student
+                </Button>
+                <Button variant="outline" onClick={() => setStatusFilter('transferred')}>
+                    <ArrowLeftRight className="mr-2 h-4 w-4" /> Manage Transfers
+                </Button>
+                <Button variant="outline" onClick={() => setStatusFilter('all')}>
+                    <FileText className="mr-2 h-4 w-4" /> View Student Directory
+                </Button>
             </div>
 
             <Card>
@@ -363,7 +399,57 @@ export default function StudentsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Student List ({filteredStudents.length})</CardTitle>
+                    <CardTitle>Recent Student Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Student</TableHead>
+                                <TableHead>Action</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {recentActivity.length > 0 ? recentActivity.map(student => (
+                                <TableRow key={student.id}>
+                                    <TableCell className="font-medium">{student.first_name} {student.last_name}</TableCell>
+                                    <TableCell>
+                                        {new Date(student.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000 
+                                            ? 'Admitted' 
+                                            : student.status === 'transferred' 
+                                            ? 'Transfer Requested' 
+                                            : 'Status Changed'}
+                                    </TableCell>
+                                    <TableCell>{new Date(student.created_at).toLocaleDateString()}</TableCell>
+                                    <TableCell>
+                                        <Badge className={statusColors[student.status] || 'bg-slate-100 text-slate-800'}>
+                                            {student.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button variant="ghost" size="sm" onClick={() => openEdit(student)}>
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            )) : (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center text-slate-500 py-8">
+                                        No recent activity.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Student Directory ({filteredStudents.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -427,19 +513,27 @@ export default function StudentsPage() {
             </Card>
 
             {/* Add Student Dialog */}
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogContent>
-                    <DialogHeader><DialogTitle>Add New Student</DialogTitle></DialogHeader>
-                    <StudentFormFields />
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowAddDialog(false)}>Cancel</Button>
-                        <Button onClick={handleAddStudent} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
-                            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            {saving ? 'Adding...' : 'Add Student'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <AddStudentDialog 
+                open={showAddDialog} 
+                onOpenChange={setShowAddDialog}
+                onSubmit={async (data) => {
+                    setSaving(true);
+                    try {
+                        const headers = await getHeaders();
+                        if (!headers) return;
+                        const res = await fetch(`${baseUrl}/students`, { method: 'POST', headers, body: JSON.stringify(data) });
+                        if (res.ok) {
+                            setShowAddDialog(false);
+                            setMessage({ type: 'success', text: 'Student added successfully.' });
+                            loadStudents();
+                        } else {
+                            const err = await res.json().catch(() => ({}));
+                            setMessage({ type: 'error', text: err.detail || 'Failed to add student.' });
+                        }
+                    } catch { setMessage({ type: 'error', text: 'Network error.' }); }
+                    finally { setSaving(false); setTimeout(() => setMessage(null), 4000); }
+                }}
+            />
 
             {/* Edit Student Dialog */}
             <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>

@@ -4,6 +4,7 @@ EduCore Backend - Core Configuration
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 from typing import Optional
+import json
 
 
 class Settings(BaseSettings):
@@ -26,6 +27,16 @@ class Settings(BaseSettings):
     
     # CORS
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    
+    @property
+    def get_cors_origins(self) -> list[str]:
+        """Parse CORS origins from env (handles JSON string)"""
+        if isinstance(self.CORS_ORIGINS, str):
+            try:
+                return json.loads(self.CORS_ORIGINS)
+            except:
+                return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+        return self.CORS_ORIGINS
     
     # Database (direct connection for some operations)
     DATABASE_URL: Optional[str] = None

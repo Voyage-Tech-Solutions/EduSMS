@@ -139,34 +139,44 @@ export default function OfficeAdminDashboard() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-emerald-500" />
-                            Fees & Payments Snapshot
+                            Fees & Payments Overview
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Collected This Month</span>
-                                <span className="font-bold text-emerald-600">${fees?.collected_this_month || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Collected This Month</span>
+                                    <p className="text-xs text-slate-500">Payments received in current billing cycle</p>
+                                </div>
+                                <span className="text-2xl font-bold text-emerald-600">${fees?.collected_this_month || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Outstanding Balance</span>
-                                <span className="font-bold text-amber-600">${fees?.outstanding_balance || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Outstanding Balance</span>
+                                    <p className="text-xs text-slate-500">Total unpaid student balances</p>
+                                </div>
+                                <span className="text-2xl font-bold text-amber-600">${fees?.outstanding_balance || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Overdue (30+ days)</span>
-                                <span className="font-bold text-red-600">${fees?.overdue_amount || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Overdue (30+ Days)</span>
+                                    <p className="text-xs text-slate-500">Payments overdue beyond 30 days</p>
+                                </div>
+                                <span className="text-2xl font-bold text-red-600">${fees?.overdue_amount || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Payment Plans Active</span>
-                                <span className="font-bold">{fees?.active_payment_plans || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Active Payment Plans</span>
+                                    <p className="text-xs text-slate-500">Students on structured payment plans</p>
+                                </div>
+                                <span className="text-2xl font-bold">{fees?.active_payment_plans || 0}</span>
                             </div>
-                            <div className="flex gap-2 mt-4">
-                                <Button size="sm" className="flex-1" onClick={() => setShowAttendanceModal(true)}>
-                                    Save Attendance
-                                </Button>
-                                <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowInvoiceModal(true)}>
-                                    Create Invoice
-                                </Button>
+                            <div className="grid grid-cols-2 gap-2 mt-4">
+                                <Button size="sm" onClick={() => setShowInvoiceModal(true)}>Create Invoice</Button>
+                                <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/office-admin/fees?action=record')}>Record Payment</Button>
+                                <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/office-admin/fees')}>View Statements</Button>
+                                <Button variant="outline" size="sm" onClick={() => setShowReminderModal(true)}>Send Reminders</Button>
                             </div>
                         </div>
                     </CardContent>
@@ -177,34 +187,45 @@ export default function OfficeAdminDashboard() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Users className="h-5 w-5 text-blue-500" />
-                            Student Admin Snapshot
+                            Student Administration Overview
                         </CardTitle>
+                        <p className="text-sm text-slate-500 mt-1">Current student status and recent activity</p>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Total Active Students</span>
-                                <span className="font-bold">{students?.total_active || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Active Students</span>
+                                    <p className="text-xs text-slate-500">Currently enrolled and active</p>
+                                </div>
+                                <span className="text-2xl font-bold">{students?.total_active || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">New Admissions This Month</span>
-                                <span className="font-bold text-emerald-600">{students?.new_this_month || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">New Admissions (This Month)</span>
+                                    <p className="text-xs text-slate-500">Students enrolled this month</p>
+                                </div>
+                                <span className="text-2xl font-bold text-emerald-600">{students?.new_this_month || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Pending Transfers</span>
-                                <span className="font-bold text-amber-600">{students?.pending_transfers || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Pending Transfers</span>
+                                    <p className="text-xs text-slate-500">Awaiting approval or processing</p>
+                                </div>
+                                <span className="text-2xl font-bold text-amber-600">{students?.pending_transfers || 0}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm">Inactive Students</span>
-                                <span className="font-bold">{students?.inactive_students || 0}</span>
+                                <div>
+                                    <span className="text-sm font-medium">Inactive Students</span>
+                                    <p className="text-xs text-slate-500">Withdrawn, graduated, or suspended</p>
+                                </div>
+                                <span className="text-2xl font-bold">{students?.inactive_students || 0}</span>
                             </div>
-                            <div className="flex gap-2 mt-4">
-                                <Button size="sm" className="flex-1" onClick={() => setShowStudentModal(true)}>
-                                    Add Student
-                                </Button>
-                                <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowStaffModal(true)}>
-                                    Add Staff
-                                </Button>
+                            <div className="grid grid-cols-2 gap-2 mt-4">
+                                <Button size="sm" onClick={() => setShowStudentModal(true)}>Add Student</Button>
+                                <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/office-admin/admissions')}>Process Admission</Button>
+                                <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/office-admin/students?filter=transfers')}>Manage Transfers</Button>
+                                <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/office-admin/students')}>View Directory</Button>
                             </div>
                         </div>
                     </CardContent>

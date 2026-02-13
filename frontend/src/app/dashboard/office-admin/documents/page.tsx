@@ -154,7 +154,7 @@ export default function DocumentsPage() {
           <Select value={filters.status} onValueChange={(v) => setFilters({...filters, status: v})}>
             <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="missing">Missing</SelectItem>
               <SelectItem value="uploaded">Uploaded</SelectItem>
               <SelectItem value="verified">Verified</SelectItem>

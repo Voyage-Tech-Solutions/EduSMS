@@ -43,7 +43,7 @@ export default function AdmissionsPage() {
         student_first_name: '', student_last_name: '', student_dob: '', gender: 'male', grade_applied_id: ''
     });
 
-    const [enrollData, setEnrollData] = useState({ class_id: '', admission_date: new Date().toISOString().split('T')[0] });
+    const [enrollData, setEnrollData] = useState({ class_id: '', admission_date: '' });
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -55,6 +55,7 @@ export default function AdmissionsPage() {
     }, []);
 
     useEffect(() => {
+        setEnrollData(prev => ({ ...prev, admission_date: new Date().toISOString().split('T')[0] }));
         loadInitialData();
     }, []);
 

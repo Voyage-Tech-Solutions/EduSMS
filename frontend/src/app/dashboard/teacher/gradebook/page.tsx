@@ -205,7 +205,11 @@ export default function TeacherGradebookPage() {
 
 function AddAssessmentDialog({ onSuccess, classId, subjectId, termId }: any) {
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState({ title: "", type: "test", total_marks: 100, date_assigned: new Date().toISOString().split('T')[0] });
+  const [data, setData] = useState({ title: "", type: "test", total_marks: 100, date_assigned: '' });
+
+  useEffect(() => {
+    setData(prev => ({ ...prev, date_assigned: new Date().toISOString().split('T')[0] }));
+  }, []);
 
   const handleSubmit = async () => {
     await fetch("/api/v1/teacher/gradebook/assessments", {

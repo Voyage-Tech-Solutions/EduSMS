@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 // Save Attendance Modal
 export function SaveAttendanceModal({ open, onClose, onSuccess }: any) {
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState('');
+
+    useEffect(() => {
+        setDate(new Date().toISOString().split('T')[0]);
+    }, []);
     const [classId, setClassId] = useState('');
     const [students, setStudents] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -211,7 +215,7 @@ export function AddStudentModal({ open, onClose, onSuccess }: any) {
         last_name: '',
         date_of_birth: '',
         gender: '',
-        admission_date: new Date().toISOString().split('T')[0],
+        admission_date: '',
         grade_id: '',
         class_id: '',
         parent_name: '',
@@ -224,6 +228,10 @@ export function AddStudentModal({ open, onClose, onSuccess }: any) {
         emergency_contact: ''
     });
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setFormData(prev => ({ ...prev, admission_date: new Date().toISOString().split('T')[0] }));
+    }, []);
 
     const handleSubmit = async () => {
         setLoading(true);

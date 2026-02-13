@@ -28,7 +28,11 @@ const statusConfig: Record<AttendanceStatus, { color: string; label: string }> =
 
 export default function AttendancePage() {
     const [selectedClass, setSelectedClass] = useState('');
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState('');
+
+    useEffect(() => {
+        setSelectedDate(new Date().toISOString().split('T')[0]);
+    }, []);
     const [students, setStudents] = useState<any[]>([]);
     const [classes, setClasses] = useState<any[]>([]);
     const [attendance, setAttendance] = useState<Record<string, AttendanceStatus>>({});

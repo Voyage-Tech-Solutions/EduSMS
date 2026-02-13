@@ -24,8 +24,10 @@ export default function MyClassesPage() {
     const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
     const [subjects, setSubjects] = useState<SubjectPerformance[]>([]);
     const [loading, setLoading] = useState(true);
+    const [today, setToday] = useState('');
 
     useEffect(() => {
+        setToday(DAY_NAMES[new Date().getDay() - 1] || 'Weekend');
         fetchData();
     }, []);
 
@@ -62,8 +64,6 @@ export default function MyClassesPage() {
         if (score >= 60) return 'text-amber-600';
         return 'text-red-600';
     };
-
-    const today = DAY_NAMES[new Date().getDay() - 1] || 'Weekend';
 
     if (loading) {
         return (

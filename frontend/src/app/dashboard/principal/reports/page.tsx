@@ -25,17 +25,19 @@ export default function PrincipalReportsPage() {
   };
 
   const generateReport = async (type: string, filters: any) => {
+    if (typeof window === 'undefined') return;
     const res = await fetch("/api/v1/principal/reports/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type, filters, range: dateRange })
     });
     const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `${type}_report.pdf`;
     a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (

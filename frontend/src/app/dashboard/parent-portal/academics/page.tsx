@@ -144,7 +144,7 @@ export default function ParentAcademicsPage() {
                   <TableCell className="font-medium">{assessment.assessments?.title || "N/A"}</TableCell>
                   <TableCell>{assessment.assessments?.subjects?.name || "N/A"}</TableCell>
                   <TableCell>{assessment.score || "N/A"}</TableCell>
-                  <TableCell>{new Date().toLocaleDateString()}</TableCell>
+                  <TableCell>{assessment.assessments?.created_at ? new Date(assessment.assessments.created_at).toLocaleDateString() : "N/A"}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">-</TableCell>
                 </TableRow>
               ))}

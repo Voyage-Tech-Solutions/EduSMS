@@ -189,7 +189,11 @@ export default function TeacherPlanningPage() {
 
 function AddLessonDialog({ onSuccess, classId, subjectId }: any) {
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState({ date: new Date().toISOString().split('T')[0], topic: "", objectives: "", homework: "" });
+  const [data, setData] = useState({ date: '', topic: "", objectives: "", homework: "" });
+
+  useEffect(() => {
+    setData(prev => ({ ...prev, date: new Date().toISOString().split('T')[0] }));
+  }, []);
 
   const handleSubmit = async () => {
     await fetch("/api/v1/teacher/planning/lessons", {
@@ -311,7 +315,11 @@ function UploadResourceDialog({ onSuccess, classId, subjectId }: any) {
 
 function AddAssessmentPlanDialog({ onSuccess, classId, subjectId }: any) {
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState({ title: "", type: "test", planned_date: new Date().toISOString().split('T')[0] });
+  const [data, setData] = useState({ title: "", type: "test", planned_date: '' });
+
+  useEffect(() => {
+    setData(prev => ({ ...prev, planned_date: new Date().toISOString().split('T')[0] }));
+  }, []);
 
   const handleSubmit = async () => {
     await fetch("/api/v1/teacher/planning/assessments", {

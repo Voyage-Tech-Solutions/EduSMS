@@ -200,7 +200,11 @@ export default function ParentAttendancePage() {
 
 function ReportAbsenceDialog({ studentId, onSuccess }: any) {
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState({ absence_date: new Date().toISOString().split('T')[0], reason: "" });
+  const [data, setData] = useState({ absence_date: '', reason: "" });
+
+  useEffect(() => {
+    setData(prev => ({ ...prev, absence_date: new Date().toISOString().split('T')[0] }));
+  }, []);
 
   const handleSubmit = async () => {
     await fetch("/api/v1/parent/attendance/report-absence", {

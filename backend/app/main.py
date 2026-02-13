@@ -127,11 +127,8 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 app.include_router(api_router)
 
 
-# Explicit OPTIONS handler for CORS preflight
-@app.options("/{full_path:path}")
-async def options_handler():
-    """Handle CORS preflight requests"""
-    return {"status": "ok"}
+# Note: CORS preflight (OPTIONS) is handled automatically by CORSMiddleware.
+# Do NOT add an explicit OPTIONS handler — it would bypass the middleware.
 
 
 # Health check endpoint

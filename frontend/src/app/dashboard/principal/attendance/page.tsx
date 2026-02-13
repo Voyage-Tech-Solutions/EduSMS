@@ -11,7 +11,11 @@ import { AlertTriangle, Send } from "lucide-react";
 export default function PrincipalAttendancePage() {
   const [summary, setSummary] = useState<any>({});
   const [classes, setClasses] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState('');
+
+  useEffect(() => {
+    setSelectedDate(new Date().toISOString().split('T')[0]);
+  }, []);
   const [showMissingModal, setShowMissingModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
 

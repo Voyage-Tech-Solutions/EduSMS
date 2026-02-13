@@ -16,7 +16,12 @@ export default function ReportsPage() {
     const [reportType, setReportType] = useState('');
     const [generating, setGenerating] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-    const [dateRange, setDateRange] = useState({ start: new Date().toISOString().split('T')[0], end: new Date().toISOString().split('T')[0] });
+    const [dateRange, setDateRange] = useState({ start: '', end: '' });
+
+    useEffect(() => {
+        const today = new Date().toISOString().split('T')[0];
+        setDateRange({ start: today, end: today });
+    }, []);
 
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 

@@ -127,6 +127,13 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 app.include_router(api_router)
 
 
+# Explicit OPTIONS handler for CORS preflight
+@app.options("/{full_path:path}")
+async def options_handler():
+    """Handle CORS preflight requests"""
+    return {"status": "ok"}
+
+
 # Health check endpoint
 @app.get("/health")
 async def health_check():

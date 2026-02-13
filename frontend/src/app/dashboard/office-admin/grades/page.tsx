@@ -98,7 +98,7 @@ export default function GradesPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => { setEditingGrade(grade); setFormData(grade); setShowDialog(true); }}>
+                      <Button variant="ghost" size="sm" onClick={() => { setEditingGrade(grade); setFormData({ ...grade, description: grade.description || "" }); setShowDialog(true); }}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => handleDelete(grade)}>

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import Optional
 from pydantic import BaseModel
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ class BillingSettingsUpdate(BaseModel):
 @router.get("/school")
 async def get_school_settings(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.table("school_settings").select("*").eq("school_id", school_id).single().execute()
@@ -46,7 +46,7 @@ async def get_school_settings(
 async def update_school_settings(
     settings: SchoolSettingsUpdate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {k: v for k, v in settings.dict().items() if v is not None}
@@ -57,7 +57,7 @@ async def update_school_settings(
 @router.get("/attendance")
 async def get_attendance_settings(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.table("attendance_settings").select("*").eq("school_id", school_id).single().execute()
@@ -67,7 +67,7 @@ async def get_attendance_settings(
 async def update_attendance_settings(
     settings: AttendanceSettingsUpdate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {k: v for k, v in settings.dict().items() if v is not None}
@@ -77,7 +77,7 @@ async def update_attendance_settings(
 @router.get("/billing")
 async def get_billing_settings(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.table("billing_settings").select("*").eq("school_id", school_id).single().execute()
@@ -87,7 +87,7 @@ async def get_billing_settings(
 async def update_billing_settings(
     settings: BillingSettingsUpdate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {k: v for k, v in settings.dict().items() if v is not None}

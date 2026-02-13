@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import date, datetime, timedelta
 from pydantic import BaseModel
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -27,7 +27,7 @@ async def get_principal_summary(
     end_date: Optional[date] = None,
     term_id: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -86,7 +86,7 @@ async def get_risk_cases(
     status: Optional[str] = None,
     severity: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("risk_cases").select("*, students(first_name, last_name, admission_number)").eq("school_id", school_id)
@@ -103,7 +103,7 @@ async def get_risk_cases(
 async def create_risk_case(
     case: RiskCaseCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {
@@ -118,7 +118,7 @@ async def create_risk_case(
 async def create_intervention(
     intervention: InterventionCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {
         **intervention.dict(),
@@ -132,7 +132,7 @@ async def get_academic_summary(
     term_id: Optional[str] = None,
     grade_id: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -162,7 +162,7 @@ async def get_academic_summary(
 async def get_arrears(
     min_days: int = 30,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     cutoff_date = (date.today() - timedelta(days=min_days)).isoformat()
@@ -177,7 +177,7 @@ async def create_writeoff(
     reason: str,
     notes: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {
         "invoice_id": invoice_id,
@@ -195,7 +195,7 @@ async def get_staff(
     role: Optional[str] = None,
     status: Optional[str] = "active",
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("user_profiles").select("*").eq("school_id", school_id)
@@ -213,7 +213,7 @@ async def deactivate_staff(
     staff_id: str,
     reason: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     result = supabase.table("user_profiles").update({"is_active": False}).eq("id", staff_id).execute()
     return {"success": True}

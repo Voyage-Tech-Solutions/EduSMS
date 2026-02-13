@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
 from datetime import datetime, timedelta, time
 from app.core.auth import get_current_user
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -24,7 +24,7 @@ async def get_grading_queue(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "teacher":
         raise HTTPException(status_code=403, detail="Teacher access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     teacher_id = current_user["id"]
     school_id = current_user["school_id"]
     
@@ -55,7 +55,7 @@ async def get_classes_snapshot(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "teacher":
         raise HTTPException(status_code=403, detail="Teacher access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     teacher_id = current_user["id"]
     school_id = current_user["school_id"]
     
@@ -102,7 +102,7 @@ async def get_attention_items(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "teacher":
         raise HTTPException(status_code=403, detail="Teacher access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     teacher_id = current_user["id"]
     school_id = current_user["school_id"]
     
@@ -133,7 +133,7 @@ async def get_planning_status(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "teacher":
         raise HTTPException(status_code=403, detail="Teacher access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     teacher_id = current_user["id"]
     
     classes = supabase.table("classes").select("id, name").eq("teacher_id", teacher_id).execute()

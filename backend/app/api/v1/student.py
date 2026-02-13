@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
 from app.core.auth import get_current_user
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ async def get_today_schedule(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "student":
         raise HTTPException(status_code=403, detail="Student access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     student = _get_student_record(supabase, current_user["id"])
     if not student or not student.get("class_id"):
         return []
@@ -77,7 +77,7 @@ async def get_today_assignments(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "student":
         raise HTTPException(status_code=403, detail="Student access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     student = _get_student_record(supabase, current_user["id"])
     if not student or not student.get("class_id"):
         return []
@@ -132,7 +132,7 @@ async def get_performance_overview(current_user: dict = Depends(get_current_user
     if current_user["role"] != "student":
         raise HTTPException(status_code=403, detail="Student access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     student = _get_student_record(supabase, current_user["id"])
     if not student:
         return {"attendance_rate": 0, "overall_average": 0, "subjects_below_70": 0}
@@ -176,7 +176,7 @@ async def get_recent_grades(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "student":
         raise HTTPException(status_code=403, detail="Student access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     student = _get_student_record(supabase, current_user["id"])
     if not student:
         return []
@@ -210,7 +210,7 @@ async def get_subject_performance(current_user: dict = Depends(get_current_user)
     if current_user["role"] != "student":
         raise HTTPException(status_code=403, detail="Student access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     student = _get_student_record(supabase, current_user["id"])
     if not student:
         return []
@@ -252,7 +252,7 @@ async def get_student_alerts(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "student":
         raise HTTPException(status_code=403, detail="Student access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     student = _get_student_record(supabase, current_user["id"])
     if not student:
         return []

@@ -3,7 +3,7 @@ from typing import List, Dict, Any
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -76,7 +76,7 @@ async def get_today_priorities(current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # 1. Admissions awaiting document verification
@@ -130,7 +130,7 @@ async def get_fees_snapshot(current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Collected this month
@@ -177,7 +177,7 @@ async def get_students_snapshot(current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Active students
@@ -221,7 +221,7 @@ async def get_documents_compliance(current_user: dict = Depends(get_current_user
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Missing birth certificates
@@ -256,7 +256,7 @@ async def get_recent_activity(current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     logs = supabase.table("audit_logs")\
@@ -281,7 +281,7 @@ async def get_exceptions(current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     exceptions = []
@@ -324,7 +324,7 @@ async def save_attendance(
     if current_user["role"] not in ["office_admin", "teacher", "principal"]:
         raise HTTPException(status_code=403, detail="Insufficient permissions")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Create attendance session
@@ -373,7 +373,7 @@ async def create_invoice(
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Generate invoice number
@@ -431,7 +431,7 @@ async def add_student(
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Generate admission number
@@ -500,7 +500,7 @@ async def add_staff(
     if current_user["role"] not in ["principal"]:
         raise HTTPException(status_code=403, detail="Principal access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Create invitation
@@ -535,7 +535,7 @@ async def send_bulk_reminder(
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Get target recipients based on type
@@ -588,7 +588,7 @@ async def allocate_payment(
     if current_user["role"] not in ["office_admin", "principal"]:
         raise HTTPException(status_code=403, detail="Office admin access required")
     
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Update payment with invoice link

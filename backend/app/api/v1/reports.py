@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import Optional
 from datetime import date
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -11,7 +11,7 @@ async def get_report_summary(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.rpc("get_report_summary", {
@@ -27,7 +27,7 @@ async def get_student_directory(
     class_id: Optional[str] = None,
     status: str = "active",
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("students").select("*").eq("school_id", school_id).eq("status", status)
@@ -47,7 +47,7 @@ async def get_attendance_summary(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("attendance_records").select("*, attendance_sessions!inner(*)").eq("attendance_sessions.school_id", school_id)

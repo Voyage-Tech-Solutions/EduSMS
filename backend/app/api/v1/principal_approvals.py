@@ -4,9 +4,35 @@ from uuid import UUID
 from datetime import datetime, timedelta
 from app.models.principal import ApprovalRequest, ApprovalDecision, ApprovalRow
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter(prefix="/principal/approvals", tags=["principal-approvals"])
+
+@router.get("/summary")
+async def get_approvals_summary(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get approval summary"""
+    try:
+        supabase = get_supabase_admin()
+        school_id = get_user_school_id(current_user)
+        
+        pending = supabase.table("approval_requests").select("id", count="exact").eq(
+            "school_id", school_id
+        ).eq("status", "pending").execute()
+        
+        return {
+            "total_pending": pending.count or 0,
+            "high_priority": 0,
+            "by_type": {}
+        }
+    except Exception as e:
+        print(f"Error in get_approvals_summary: {str(e)}")
+        return {
+            "total_pending": 0,
+            "high_priority": 0,
+            "by_type": {}
+        }
 
 @router.get("")
 async def get_approvals(
@@ -16,7 +42,7 @@ async def get_approvals(
     current_user: dict = Depends(get_current_user)
 ):
     """Get approval requests"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     query = supabase.table("approval_requests").select("""
@@ -79,7 +105,7 @@ async def get_approval_details(
     current_user: dict = Depends(get_current_user)
 ):
     """Get approval details"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     approval = supabase.table("approval_requests").select("*").eq(
@@ -101,7 +127,7 @@ async def make_approval_decision(
     current_user: dict = Depends(get_current_user)
 ):
     """Approve or reject request"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Get approval
@@ -157,7 +183,7 @@ async def get_approval_stats(
     current_user: dict = Depends(get_current_user)
 ):
     """Get approval statistics"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Get counts

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional, List
 from datetime import datetime, timedelta
 from pydantic import BaseModel
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter()
 
@@ -53,7 +53,7 @@ class UpdateProfileRequest(BaseModel):
 @router.get("/dashboard")
 async def get_parent_dashboard(
     student_id: Optional[str] = Query(None),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Parent home dashboard with daily status, academic snapshot, financial summary, alerts"""
     
@@ -143,7 +143,7 @@ async def get_parent_dashboard(
 # ============================================================
 
 @router.get("/children")
-async def get_children(supabase = Depends(get_supabase_client)):
+async def get_children(supabase = Depends(get_supabase_admin)):
     """List all children with overview stats"""
     
     children_response = supabase.table("students").select(
@@ -196,7 +196,7 @@ async def get_children(supabase = Depends(get_supabase_client)):
 @router.get("/attendance")
 async def get_attendance(
     student_id: str = Query(...),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Get attendance records and statistics"""
     
@@ -225,7 +225,7 @@ async def get_attendance(
 @router.post("/attendance/report-absence")
 async def report_absence(
     request: ReportAbsenceRequest,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Report student absence"""
     
@@ -246,7 +246,7 @@ async def report_absence(
 @router.get("/academics")
 async def get_academics(
     student_id: str = Query(...),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Get academic performance by subject"""
     
@@ -295,7 +295,7 @@ async def get_academics(
 @router.get("/assignments")
 async def get_assignments(
     student_id: str = Query(...),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Get all assignments for student"""
     
@@ -315,7 +315,7 @@ async def get_assignments(
 @router.post("/assignments/upload")
 async def submit_assignment(
     request: SubmitAssignmentRequest,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Submit assignment"""
     
@@ -337,7 +337,7 @@ async def submit_assignment(
 @router.get("/invoices")
 async def get_invoices(
     student_id: str = Query(...),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Get all invoices and payment history"""
     
@@ -370,7 +370,7 @@ async def get_invoices(
 @router.post("/payments")
 async def make_payment(
     request: PaymentRequest,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Process payment"""
     
@@ -407,7 +407,7 @@ async def make_payment(
 @router.get("/documents")
 async def get_documents(
     student_id: str = Query(...),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Get all documents for student"""
     
@@ -420,7 +420,7 @@ async def get_documents(
 @router.post("/documents/upload")
 async def upload_document(
     request: UploadDocumentRequest,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Upload document"""
     
@@ -440,7 +440,7 @@ async def upload_document(
 # ============================================================
 
 @router.get("/messages")
-async def get_messages(supabase = Depends(get_supabase_client)):
+async def get_messages(supabase = Depends(get_supabase_admin)):
     """Get all messages"""
     
     messages = supabase.table("messages").select(
@@ -452,7 +452,7 @@ async def get_messages(supabase = Depends(get_supabase_client)):
 @router.post("/messages")
 async def send_message(
     request: SendMessageRequest,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Send message"""
     
@@ -471,7 +471,7 @@ async def send_message(
 # ============================================================
 
 @router.get("/notices")
-async def get_notices(supabase = Depends(get_supabase_client)):
+async def get_notices(supabase = Depends(get_supabase_admin)):
     """Get all school notices"""
     
     notices = supabase.table("announcements").select(
@@ -483,7 +483,7 @@ async def get_notices(supabase = Depends(get_supabase_client)):
 @router.post("/notices/{notice_id}/acknowledge")
 async def acknowledge_notice(
     notice_id: str,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Acknowledge a school notice"""
 
@@ -500,7 +500,7 @@ async def acknowledge_notice(
 # ============================================================
 
 @router.get("/profile")
-async def get_profile(supabase = Depends(get_supabase_client)):
+async def get_profile(supabase = Depends(get_supabase_admin)):
     """Get parent profile"""
     
     profile = supabase.table("user_profiles").select(
@@ -512,7 +512,7 @@ async def get_profile(supabase = Depends(get_supabase_client)):
 @router.patch("/profile")
 async def update_profile(
     request: UpdateProfileRequest,
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     """Update parent profile"""
     

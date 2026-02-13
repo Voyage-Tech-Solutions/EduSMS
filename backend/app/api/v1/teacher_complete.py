@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from typing import List
 from datetime import datetime, timedelta
 from pydantic import BaseModel
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ class SaveAttendanceRequest(BaseModel):
 
 # Dashboard
 @router.get("/dashboard")
-async def get_teacher_dashboard(supabase = Depends(get_supabase_client)):
+async def get_teacher_dashboard(supabase = Depends(get_supabase_admin)):
     """Teacher control center"""
     
     return {
@@ -41,14 +41,14 @@ async def get_teacher_dashboard(supabase = Depends(get_supabase_client)):
 
 # Classes
 @router.get("/classes")
-async def get_teacher_classes(supabase = Depends(get_supabase_client)):
+async def get_teacher_classes(supabase = Depends(get_supabase_admin)):
     """Get teacher's assigned classes"""
     
     classes = supabase.table("classes").select("id, name, capacity").execute()
     return classes.data
 
 @router.get("/classes/{class_id}/students")
-async def get_class_students(class_id: str, supabase = Depends(get_supabase_client)):
+async def get_class_students(class_id: str, supabase = Depends(get_supabase_admin)):
     """Get students in a class"""
     
     students = supabase.table("students").select("id, admission_number, first_name, last_name").eq("class_id", class_id).execute()
@@ -56,7 +56,7 @@ async def get_class_students(class_id: str, supabase = Depends(get_supabase_clie
 
 # Attendance
 @router.post("/attendance/save")
-async def save_attendance(request: SaveAttendanceRequest, supabase = Depends(get_supabase_client)):
+async def save_attendance(request: SaveAttendanceRequest, supabase = Depends(get_supabase_admin)):
     """Save attendance records"""
     
     # Create session
@@ -81,7 +81,7 @@ async def save_attendance(request: SaveAttendanceRequest, supabase = Depends(get
 
 # Gradebook
 @router.get("/gradebook")
-async def get_gradebook(class_id: str, subject_id: str, supabase = Depends(get_supabase_client)):
+async def get_gradebook(class_id: str, subject_id: str, supabase = Depends(get_supabase_admin)):
     """Get gradebook data"""
     
     assessments = supabase.table("assessments").select("*, assessment_scores(*)").eq("class_id", class_id).eq("subject_id", subject_id).execute()
@@ -90,7 +90,7 @@ async def get_gradebook(class_id: str, subject_id: str, supabase = Depends(get_s
 
 # Assignments
 @router.get("/assignments")
-async def get_assignments(supabase = Depends(get_supabase_client)):
+async def get_assignments(supabase = Depends(get_supabase_admin)):
     """Get teacher's assignments"""
     
     assignments = supabase.table("assignments").select("*, assignment_submissions(*)").execute()
@@ -98,7 +98,7 @@ async def get_assignments(supabase = Depends(get_supabase_client)):
     return assignments.data
 
 @router.post("/assignments")
-async def create_assignment(title: str, class_id: str, due_date: str, supabase = Depends(get_supabase_client)):
+async def create_assignment(title: str, class_id: str, due_date: str, supabase = Depends(get_supabase_admin)):
     """Create new assignment"""
     
     result = supabase.table("assignments").insert({

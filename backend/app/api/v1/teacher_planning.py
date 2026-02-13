@@ -7,7 +7,7 @@ from app.models.teacher import (
     UploadResourceRequest, CopyWeekRequest
 )
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter(prefix="/teacher/planning", tags=["teacher-planning"])
 
@@ -20,7 +20,7 @@ async def get_weekly_plan(
     current_user: dict = Depends(get_current_user)
 ):
     """Get weekly lesson plan"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Parse week
@@ -71,7 +71,7 @@ async def create_lesson_plan(
     current_user: dict = Depends(get_current_user)
 ):
     """Create lesson plan"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     lesson = supabase.table("lesson_plans").insert({
@@ -99,7 +99,7 @@ async def update_lesson_plan(
     current_user: dict = Depends(get_current_user)
 ):
     """Update lesson plan"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     
     result = supabase.table("lesson_plans").update({
         "topic": request.topic,
@@ -119,7 +119,7 @@ async def mark_lesson_delivered(
     current_user: dict = Depends(get_current_user)
 ):
     """Mark lesson as delivered/missed"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     
     result = supabase.table("lesson_plans").update({
         "status": status,
@@ -134,7 +134,7 @@ async def copy_previous_week(
     current_user: dict = Depends(get_current_user)
 ):
     """Copy previous week's plans"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Parse weeks
@@ -185,7 +185,7 @@ async def create_assessment_plan(
     current_user: dict = Depends(get_current_user)
 ):
     """Create assessment plan"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     assessment = supabase.table("assessment_plans").insert({
@@ -210,7 +210,7 @@ async def convert_to_assessment(
     current_user: dict = Depends(get_current_user)
 ):
     """Convert assessment plan to actual assessment"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Get plan
@@ -263,7 +263,7 @@ async def upload_resource(
     current_user: dict = Depends(get_current_user)
 ):
     """Upload teaching resource"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     resource = supabase.table("resources").insert({
@@ -288,7 +288,7 @@ async def get_curriculum_coverage(
     current_user: dict = Depends(get_current_user)
 ):
     """Get curriculum coverage progress"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     
     # Get curriculum units
     units = supabase.table("curriculum_units").select("*").eq(

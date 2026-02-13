@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, Query
 from typing import Optional
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter()
 
 # Students endpoints
 @router.get("/students/summary")
-async def get_students_summary(supabase = Depends(get_supabase_client)):
+async def get_students_summary(supabase = Depends(get_supabase_admin)):
     students = supabase.table("students").select("id, status").execute()
     total = len(students.data)
     at_risk = len([s for s in students.data if s.get("status") == "at_risk"])
@@ -25,7 +25,7 @@ async def get_students(
     grade: str = Query(""),
     status: str = Query("active"),
     risk: str = Query(""),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     query = supabase.table("students").select("*, grades(name)")
     
@@ -48,7 +48,7 @@ async def get_students(
 
 # Approvals endpoints
 @router.get("/approvals/summary")
-async def get_approvals_summary(supabase = Depends(get_supabase_client)):
+async def get_approvals_summary(supabase = Depends(get_supabase_admin)):
     approvals = supabase.table("approval_requests").select("status, priority").execute()
     
     return {
@@ -61,7 +61,7 @@ async def get_approvals_summary(supabase = Depends(get_supabase_client)):
 @router.get("/approvals")
 async def get_approvals(
     status: str = Query("pending"),
-    supabase = Depends(get_supabase_client)
+    supabase = Depends(get_supabase_admin)
 ):
     query = supabase.table("approval_requests").select("*")
     

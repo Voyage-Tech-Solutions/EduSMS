@@ -3,7 +3,7 @@ from typing import List, Optional
 from datetime import date
 from pydantic import BaseModel
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -31,7 +31,7 @@ class DocumentRequirementCreate(BaseModel):
 @router.get("/compliance-summary")
 async def get_compliance_summary(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.rpc("get_document_compliance_summary", {"p_school_id": school_id}).execute()
@@ -44,7 +44,7 @@ async def get_documents(
     expired_only: bool = False,
     missing_only: bool = False,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("documents").select("*").eq("school_id", school_id)
@@ -65,7 +65,7 @@ async def get_documents(
 async def upload_document(
     doc: DocumentUpload,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {
@@ -82,7 +82,7 @@ async def verify_document(
     doc_id: str,
     verify: DocumentVerify,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {
         "verified": verify.verified,
@@ -97,7 +97,7 @@ async def verify_document(
 @router.get("/requirements")
 async def get_requirements(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.table("document_requirements").select("*").eq("school_id", school_id).eq("active", True).execute()
@@ -107,7 +107,7 @@ async def get_requirements(
 async def create_requirement(
     req: DocumentRequirementCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {**req.dict(), "school_id": school_id}

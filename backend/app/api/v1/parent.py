@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
 from app.core.auth import get_current_user
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ async def get_children_overview(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     parent_id = current_user["id"]
 
     student_ids = _get_parent_student_ids(supabase, parent_id)
@@ -89,7 +89,7 @@ async def get_notifications(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     parent_id = current_user["id"]
 
     student_ids = _get_parent_student_ids(supabase, parent_id)
@@ -171,7 +171,7 @@ async def get_fees_summary(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     parent_id = current_user["id"]
 
     student_ids = _get_parent_student_ids(supabase, parent_id)
@@ -204,7 +204,7 @@ async def get_academic_progress(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     parent_id = current_user["id"]
 
     student_ids = _get_parent_student_ids(supabase, parent_id)
@@ -274,7 +274,7 @@ async def get_announcements(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = current_user.get("school_id")
 
     now = datetime.now().isoformat()
@@ -323,7 +323,7 @@ async def get_child_schedule_today(student_id: str, current_user: dict = Depends
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     _verify_parent_owns_student(supabase, current_user["id"], student_id)
 
     student = supabase.table("students").select("id, class_id").eq("id", student_id).eq("status", "active").single().execute()
@@ -361,7 +361,7 @@ async def get_child_assignments(student_id: str, current_user: dict = Depends(ge
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     _verify_parent_owns_student(supabase, current_user["id"], student_id)
 
     student = supabase.table("students").select("id, class_id").eq("id", student_id).eq("status", "active").single().execute()
@@ -412,7 +412,7 @@ async def get_child_subject_performance(student_id: str, current_user: dict = De
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     _verify_parent_owns_student(supabase, current_user["id"], student_id)
 
     grades = supabase.table("grade_entries").select("score, max_score, subject_id").eq("student_id", student_id).execute()
@@ -446,7 +446,7 @@ async def get_child_recent_grades(student_id: str, current_user: dict = Depends(
     if current_user["role"] != "parent":
         raise HTTPException(status_code=403, detail="Parent access required")
 
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     _verify_parent_owns_student(supabase, current_user["id"], student_id)
 
     grades = supabase.table("grade_entries").select(

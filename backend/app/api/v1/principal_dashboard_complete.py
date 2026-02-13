@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from pydantic import BaseModel
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter()
 
@@ -28,7 +28,7 @@ async def get_principal_summary(
     end_date: Optional[date] = None,
     range: Optional[str] = "last_30_days",
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -121,7 +121,7 @@ async def get_principal_summary(
 async def get_risk_cases(
     status: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("risk_cases").select("*, students(first_name, last_name, admission_number)").eq("school_id", school_id)
@@ -133,7 +133,7 @@ async def get_risk_cases(
 async def create_risk_case(
     case: RiskCaseCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {**case.dict(), "school_id": school_id, "opened_by": user["id"]}
@@ -142,7 +142,7 @@ async def create_risk_case(
 @router.post("/risk-cases/auto-detect")
 async def auto_detect_risk_cases(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.rpc("detect_at_risk_students", {"p_school_id": school_id}).execute()
@@ -165,7 +165,7 @@ async def auto_detect_risk_cases(
 async def create_intervention(
     intervention: InterventionCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {**intervention.dict(), "created_by": user["id"]}
     return supabase.table("interventions").insert(data).execute().data[0]
@@ -174,7 +174,7 @@ async def create_intervention(
 async def get_academic_summary(
     term_id: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     assessments = supabase.table("assessments").select("id").eq("school_id", school_id).execute()
@@ -201,7 +201,7 @@ async def get_academic_summary(
 async def get_grade_performance(
     term_id: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     return supabase.rpc("get_grade_performance", {"p_school_id": school_id, "p_term_id": term_id}).execute().data
@@ -210,7 +210,7 @@ async def get_grade_performance(
 async def get_subject_rankings(
     term_id: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     return supabase.rpc("get_subject_rankings", {"p_school_id": school_id, "p_term_id": term_id}).execute().data
@@ -218,7 +218,7 @@ async def get_subject_rankings(
 @router.get("/academic/teachers")
 async def get_teacher_performance(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     return supabase.rpc("get_staff_performance", {"p_school_id": school_id}).execute().data
@@ -230,7 +230,7 @@ async def send_marking_reminder(
     message: str,
     channel: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     supabase.table("notifications_log").insert({
@@ -246,30 +246,54 @@ async def send_marking_reminder(
 
 @router.get("/attendance/summary")
 async def get_attendance_summary(
-    date: date,
+    date: Optional[date] = Query(default=None),
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
-    school_id = get_user_school_id(user)
-    records = supabase.table("attendance_records").select("status").eq("school_id", school_id).eq("date", date.isoformat()).execute().data
-    present = len([r for r in records if r["status"] == "present"])
-    absent = len([r for r in records if r["status"] == "absent"])
-    late = len([r for r in records if r["status"] == "late"])
-    excused = len([r for r in records if r["status"] == "excused"])
-    total = len(records)
-    return {
-        "present": present,
-        "absent": absent,
-        "late": late,
-        "excused": excused,
-        "attendance_rate": round(((present + late) / total * 100), 1) if total > 0 else 0
-    }
+    """Get attendance summary for a date"""
+    try:
+        school_id = get_user_school_id(user)
+        target_date = date.isoformat() if date else datetime.now().date().isoformat()
+        
+        records = supabase.table("attendance_records").select("status").eq("school_id", school_id).eq("date", target_date).execute().data
+        
+        if not records:
+            return {
+                "present": 0,
+                "absent": 0,
+                "late": 0,
+                "excused": 0,
+                "attendance_rate": 0
+            }
+        
+        present = len([r for r in records if r["status"] == "present"])
+        absent = len([r for r in records if r["status"] == "absent"])
+        late = len([r for r in records if r["status"] == "late"])
+        excused = len([r for r in records if r["status"] == "excused"])
+        total = len(records)
+        
+        return {
+            "present": present,
+            "absent": absent,
+            "late": late,
+            "excused": excused,
+            "attendance_rate": round(((present + late) / total * 100), 1) if total > 0 else 0
+        }
+    except Exception as e:
+        print(f"Error in get_attendance_summary: {str(e)}")
+        return {
+            "present": 0,
+            "absent": 0,
+            "late": 0,
+            "excused": 0,
+            "attendance_rate": 0
+        }
 
 @router.get("/attendance/classes")
 async def get_attendance_by_classes(
     date: Optional[date] = Query(default=None),
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     """Get attendance breakdown by class for a given date"""
     school_id = get_user_school_id(user)
@@ -317,7 +341,7 @@ async def get_attendance_by_classes(
 async def get_missing_submissions(
     date: date = Query(default_factory=date.today),
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     return supabase.rpc("get_missing_attendance_submissions", {"p_school_id": school_id, "p_date": date.isoformat()}).execute().data
@@ -329,7 +353,7 @@ async def send_attendance_reminder(
     message: str,
     channel: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     supabase.table("notifications_log").insert({
@@ -349,7 +373,7 @@ async def export_dashboard(
     range: str = "last_30_days",
     format: str = "pdf",
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     # Get summary data
@@ -370,7 +394,7 @@ async def export_dashboard(
 @router.get("/finance/summary")
 async def get_finance_summary(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     invoices = supabase.table("invoices").select("amount, amount_paid, due_date").eq("school_id", school_id).execute()
@@ -388,7 +412,7 @@ async def get_finance_summary(
 @router.get("/finance/arrears")
 async def get_arrears(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     cutoff = (date.today() - timedelta(days=30)).isoformat()
@@ -401,7 +425,7 @@ async def create_writeoff(
     reason: str,
     notes: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {"invoice_id": invoice_id, "adjustment_type": "writeoff", "amount": amount, "reason": reason, "notes": notes, "approved_by": user["id"]}
     return supabase.table("invoice_adjustments").insert(data).execute().data[0]
@@ -410,7 +434,7 @@ async def create_writeoff(
 async def get_staff(
     role: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("user_profiles").select("*").eq("school_id", school_id)
@@ -426,7 +450,7 @@ async def create_payment_plan(
     start_date: date,
     notes: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {
         "invoice_id": invoice_id,
@@ -446,7 +470,7 @@ async def send_finance_reminder(
     channel: str,
     min_balance: Optional[float] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     supabase.table("notifications_log").insert({
@@ -470,7 +494,7 @@ async def create_staff(
     role: str = "teacher",
     department: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {
@@ -494,7 +518,7 @@ async def update_staff(
     phone: Optional[str] = None,
     role: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     data = {k: v for k, v in {
         "first_name": first_name,
@@ -510,7 +534,7 @@ async def deactivate_staff(
     staff_id: str,
     reason: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     supabase.table("user_profiles").update({"is_active": False}).eq("id", staff_id).execute()

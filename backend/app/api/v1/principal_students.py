@@ -7,9 +7,44 @@ from app.models.principal import (
     SendNotificationRequest, ChangeStatusRequest
 )
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter(prefix="/principal/students", tags=["principal-students"])
+
+@router.get("/summary")
+async def get_students_summary(
+    current_user: dict = Depends(get_current_user)
+):
+    """Get students summary"""
+    try:
+        supabase = get_supabase_admin()
+        school_id = get_user_school_id(current_user)
+        
+        students = supabase.table("students").select("id, status").eq("school_id", school_id).execute()
+        
+        total = len(students.data) if students.data else 0
+        active = len([s for s in (students.data or []) if s["status"] == "active"])
+        
+        return {
+            "total": total,
+            "active": active,
+            "inactive": 0,
+            "transferred": 0,
+            "at_risk": 0,
+            "chronic_absentees": 0,
+            "academic_below_pass": 0
+        }
+    except Exception as e:
+        print(f"Error in get_students_summary: {str(e)}")
+        return {
+            "total": 0,
+            "active": 0,
+            "inactive": 0,
+            "transferred": 0,
+            "at_risk": 0,
+            "chronic_absentees": 0,
+            "academic_below_pass": 0
+        }
 
 @router.get("")
 async def get_students_oversight(
@@ -23,7 +58,7 @@ async def get_students_oversight(
     current_user: dict = Depends(get_current_user)
 ):
     """Get students with oversight metrics"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     query = supabase.table("students").select("""
@@ -120,7 +155,7 @@ async def get_student_profile(
     current_user: dict = Depends(get_current_user)
 ):
     """Get detailed student profile with trends"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Get student details
@@ -156,7 +191,7 @@ async def flag_for_intervention(
     current_user: dict = Depends(get_current_user)
 ):
     """Flag student for intervention"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Create risk case
@@ -188,7 +223,7 @@ async def send_parent_notification(
     current_user: dict = Depends(get_current_user)
 ):
     """Send notification to parent"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     notification = supabase.table("parent_notifications").insert({
@@ -210,7 +245,7 @@ async def change_student_status(
     current_user: dict = Depends(get_current_user)
 ):
     """Change student status"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Update student status

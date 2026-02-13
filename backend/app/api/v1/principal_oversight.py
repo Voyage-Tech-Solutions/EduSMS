@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from typing import Optional
 from datetime import date, datetime, timedelta
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ router = APIRouter()
 @router.get("/students/summary")
 async def get_students_summary(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -43,7 +43,7 @@ async def get_students(
     status: str = "active",
     risk: Optional[str] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -80,7 +80,7 @@ async def create_student_risk(
     severity: str,
     notes: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -103,7 +103,7 @@ async def update_student_status(
     reason: str,
     effective_date: date,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -128,7 +128,7 @@ async def update_student_status(
 async def get_reports_summary(
     range: str = "this_term",
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -160,7 +160,7 @@ async def generate_report(
     filters: dict,
     range: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -181,7 +181,7 @@ async def generate_report(
 @router.get("/approvals/summary")
 async def get_approvals_summary(
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -203,7 +203,7 @@ async def get_approvals_summary(
 async def get_approvals(
     status: str = "pending",
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -227,7 +227,7 @@ async def make_approval_decision(
     decision: str,
     notes: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     

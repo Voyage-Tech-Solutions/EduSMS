@@ -4,7 +4,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from pydantic import BaseModel
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase_client import get_supabase_client
+from app.db.supabase_client import get_supabase_admin
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ async def get_fee_summary(
     start_date: Optional[date] = None,
     end_date: Optional[date] = None,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     result = supabase.rpc("get_fee_collection_summary", {
@@ -53,7 +53,7 @@ async def get_invoices(
     term_id: Optional[str] = None,
     overdue_only: bool = False,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     query = supabase.table("invoices").select("*, students(first_name, last_name, admission_number)").eq("school_id", school_id)
@@ -74,7 +74,7 @@ async def get_invoices(
 async def create_invoice(
     invoice: InvoiceCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     invoice_no = supabase.rpc("generate_invoice_number", {"p_school_id": school_id}).execute().data
@@ -98,7 +98,7 @@ async def create_invoice(
 async def record_payment(
     payment: PaymentCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     
@@ -137,7 +137,7 @@ async def record_payment(
 async def create_fee_structure(
     structure: FeeStructureCreate,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     data = {**structure.dict(), "school_id": school_id}
@@ -150,7 +150,7 @@ async def auto_generate_invoices(
     term_id: str,
     fee_structure_id: str,
     user=Depends(get_current_user),
-    supabase=Depends(get_supabase_client)
+    supabase=Depends(get_supabase_admin)
 ):
     school_id = get_user_school_id(user)
     count = supabase.rpc("auto_generate_invoices", {

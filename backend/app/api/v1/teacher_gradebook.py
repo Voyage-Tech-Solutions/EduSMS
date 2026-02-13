@@ -6,7 +6,7 @@ import csv
 import io
 from app.models.teacher import CreateAssessmentRequest, ImportMarksRequest, LockGradebookRequest, AssessmentScore
 from app.core.auth import get_current_user, get_user_school_id
-from app.db.supabase import get_supabase_client
+from app.db.supabase import get_supabase_admin
 
 router = APIRouter(prefix="/teacher/gradebook", tags=["teacher-gradebook"])
 
@@ -18,7 +18,7 @@ async def get_gradebook(
     current_user: dict = Depends(get_current_user)
 ):
     """Get gradebook spreadsheet data"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Check if gradebook is locked
@@ -104,7 +104,7 @@ async def create_assessment(
     current_user: dict = Depends(get_current_user)
 ):
     """Create new assessment"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Create assessment
@@ -145,7 +145,7 @@ async def update_assessment(
     current_user: dict = Depends(get_current_user)
 ):
     """Update assessment"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     
     result = supabase.table("assessments").update({
         "title": request.title,
@@ -164,7 +164,7 @@ async def save_scores(
     current_user: dict = Depends(get_current_user)
 ):
     """Save assessment scores (bulk)"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     
     # Get assessment to validate total_marks
     assessment = supabase.table("assessments").select("total_marks").eq(
@@ -194,7 +194,7 @@ async def import_marks(
     current_user: dict = Depends(get_current_user)
 ):
     """Import marks from CSV"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     
     # Read CSV
     content = await file.read()
@@ -259,7 +259,7 @@ async def lock_gradebook(
     current_user: dict = Depends(get_current_user)
 ):
     """Lock gradebook"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Check if already locked
@@ -291,7 +291,7 @@ async def request_unlock(
     current_user: dict = Depends(get_current_user)
 ):
     """Request gradebook unlock"""
-    supabase = get_supabase_client()
+    supabase = get_supabase_admin()
     school_id = get_user_school_id(current_user)
     
     # Update lock record

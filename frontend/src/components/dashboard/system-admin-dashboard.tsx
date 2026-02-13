@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { authFetch } from '@/lib/authFetch';
 import { StatCard } from '@/components/dashboard';
 import { AddSchoolDialog } from '@/components/forms/add-school-dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,11 +37,11 @@ export function SystemAdminDashboard() {
     const loadDashboardData = async () => {
         try {
             const [metricsData, schoolsData, alertsData, activityData, securityData] = await Promise.all([
-                fetch('/api/v1/system/platform-metrics').then(r => r.json()).catch(() => ({})),
-                fetch('/api/v1/system/schools').then(r => r.json()).catch(() => []),
-                fetch('/api/v1/system/alerts').then(r => r.json()).catch(() => []),
-                fetch('/api/v1/system/activity').then(r => r.json()).catch(() => []),
-                fetch('/api/v1/system/security/summary').then(r => r.json()).catch(() => ({})),
+                authFetch('/api/v1/system/platform-metrics').then(r => r.json()).catch(() => ({})),
+                authFetch('/api/v1/system/schools').then(r => r.json()).catch(() => []),
+                authFetch('/api/v1/system/alerts').then(r => r.json()).catch(() => []),
+                authFetch('/api/v1/system/activity').then(r => r.json()).catch(() => []),
+                authFetch('/api/v1/system/security/summary').then(r => r.json()).catch(() => ({})),
             ]);
 
             setMetrics({ ...metricsData, ...securityData });

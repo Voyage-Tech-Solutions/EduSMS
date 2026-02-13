@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,14 +21,14 @@ export default function TeacherAttendancePage() {
   const [attendance, setAttendance] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch("/api/v1/teacher/classes")
+    authFetch("/api/v1/teacher/classes")
       .then(res => res.json())
       .then(data => setClasses(data));
   }, []);
 
   useEffect(() => {
     if (selectedClass) {
-      fetch(`/api/v1/teacher/classes/${selectedClass}/students`)
+      authFetch(`/api/v1/teacher/classes/${selectedClass}/students`)
         .then(res => res.json())
         .then(data => {
           setStudents(data);
@@ -50,7 +51,7 @@ export default function TeacherAttendancePage() {
       status
     }));
 
-    await fetch("/api/v1/teacher/attendance/save", {
+    await authFetch("/api/v1/teacher/attendance/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ class_id: selectedClass, date, records })

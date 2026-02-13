@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,7 @@ export default function PrincipalAcademicPage() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
-    const res = await fetch("/api/v1/principal-dashboard/academic/summary");
+    const res = await authFetch("/api/v1/principal-dashboard/academic/summary");
     setSummary(await res.json());
   };
 

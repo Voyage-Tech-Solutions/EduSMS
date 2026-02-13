@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,19 +23,19 @@ export default function PrincipalApprovalsPage() {
   }, [filter]);
 
   const fetchSummary = async () => {
-    const res = await fetch("/api/v1/principal/approvals/summary");
+    const res = await authFetch("/api/v1/principal/approvals/summary");
     const data = await res.json();
     setSummary(data);
   };
 
   const fetchApprovals = async () => {
-    const res = await fetch(`/api/v1/principal/approvals?status=${filter}`);
+    const res = await authFetch(`/api/v1/principal/approvals?status=${filter}`);
     const data = await res.json();
     setApprovals(data);
   };
 
   const handleDecision = async (decision: string, notes: string) => {
-    await fetch(`/api/v1/principal/approvals/${selectedApproval.id}/decision`, {
+    await authFetch(`/api/v1/principal/approvals/${selectedApproval.id}/decision`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ decision, notes })

@@ -480,6 +480,21 @@ async def get_notices(supabase = Depends(get_supabase_client)):
     
     return {"notices": notices.data}
 
+@router.post("/notices/{notice_id}/acknowledge")
+async def acknowledge_notice(
+    notice_id: str,
+    supabase = Depends(get_supabase_client)
+):
+    """Acknowledge a school notice"""
+
+    # Upsert to avoid duplicate acknowledgements
+    result = supabase.table("notice_acknowledgements").upsert({
+        "notice_id": notice_id,
+        "acknowledged_at": datetime.now().isoformat()
+    }, on_conflict="notice_id").execute()
+
+    return {"message": "Notice acknowledged", "data": result.data}
+
 # ============================================================
 # PAGE 10: PARENT PROFILE
 # ============================================================

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,7 +22,7 @@ export default function PrincipalStaffPage() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/v1/principal-dashboard/staff");
+      const res = await authFetch("/api/v1/principal-dashboard/staff");
       if (res.ok) {
         setStaff(await res.json());
       } else {
@@ -37,7 +38,7 @@ export default function PrincipalStaffPage() {
     e.preventDefault();
     try {
       const formData = new FormData(e.currentTarget);
-      await fetch("/api/v1/staff", {
+      await authFetch("/api/v1/staff", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -57,7 +58,7 @@ export default function PrincipalStaffPage() {
 
   const handleDeactivate = async () => {
     try {
-      await fetch(`/api/v1/principal-dashboard/staff/${selectedStaff.id}/deactivate`, {
+      await authFetch(`/api/v1/principal-dashboard/staff/${selectedStaff.id}/deactivate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason: "Principal deactivation" })

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/lib/authFetch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +22,7 @@ export default function SchoolsPage() {
 
     const loadSchools = async () => {
         try {
-            const response = await fetch('/api/v1/system/schools');
+            const response = await authFetch('/api/v1/system/schools');
             const data = await response.json();
             setSchools(data);
         } catch (error) {

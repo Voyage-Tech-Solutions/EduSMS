@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,7 +21,7 @@ export default function RiskManagementPage() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
-    const res = await fetch("/api/v1/principal-dashboard/risk-cases");
+    const res = await authFetch("/api/v1/principal-dashboard/risk-cases");
     setRiskCases(await res.json());
   };
 

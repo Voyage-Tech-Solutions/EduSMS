@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +18,7 @@ export default function ParentNoticesPage() {
   }, []);
 
   const fetchNotices = async () => {
-    const response = await fetch("/api/v1/parent/notices");
+    const response = await authFetch("/api/v1/parent/notices");
     const data = await response.json();
     setNotices(data.notices || []);
     setLoading(false);
@@ -192,7 +193,7 @@ function AcknowledgeButton({ noticeId, onSuccess }: any) {
   const [acknowledged, setAcknowledged] = useState(false);
 
   const handleAcknowledge = async () => {
-    await fetch(`/api/v1/parent/notices/${noticeId}/acknowledge`, {
+    await authFetch(`/api/v1/parent/notices/${noticeId}/acknowledge`, {
       method: "POST",
     });
     setAcknowledged(true);

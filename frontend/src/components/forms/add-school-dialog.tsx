@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { authFetch } from '@/lib/authFetch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +28,7 @@ export function AddSchoolDialog({ onSchoolAdded }: AddSchoolDialogProps) {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/v1/system/schools', {
+            const response = await authFetch('/api/v1/system/schools', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

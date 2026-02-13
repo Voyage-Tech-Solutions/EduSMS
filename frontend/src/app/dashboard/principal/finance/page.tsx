@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,16 +21,16 @@ export default function PrincipalFinancePage() {
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
-    const res = await fetch("/api/v1/principal-dashboard/finance/summary");
+    const res = await authFetch("/api/v1/principal-dashboard/finance/summary");
     setSummary(await res.json());
-    const invRes = await fetch("/api/v1/principal-dashboard/finance/arrears");
+    const invRes = await authFetch("/api/v1/principal-dashboard/finance/arrears");
     setInvoices(await invRes.json());
   };
 
   const handleWriteoff = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    await fetch("/api/v1/principal-dashboard/finance/writeoff", {
+    await authFetch("/api/v1/principal-dashboard/finance/writeoff", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

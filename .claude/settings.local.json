@@ -17,7 +17,12 @@
       "Bash(git remote add:*)",
       "Bash(git push:*)",
       "Bash(dir /b \"C:\\\\Users\\\\bathini bona\\\\Documents\\\\EduSMS\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(\"/c/Users/bathini bona/Documents/EduSMS/fix_fetch.ps1\" << 'PSEOF'\n$file = \"C:\\\\Users\\\\bathini bona\\\\Documents\\\\EduSMS\\\\frontend\\\\src\\\\app\\\\dashboard\\\\teacher\\\\planning\\\\page.tsx\"\n$content = Get-Content $file -Raw\n# Add import after first import line\n$content = $content -replace '\\(import \\\\{ useState, useEffect \\\\} from \"react\";\\)', \"`$1`nimport { authFetch } from `\"@/lib/authFetch`\";\"\n# Replace fetch with authFetch for API calls \\(double-quoted strings\\)\n$content = $content -replace 'fetch\\\\\\(\"/api/v1/', 'authFetch\\(\"/api/v1/'\n# Replace fetch with authFetch for API calls \\(template literals\\)\n$content = $content -replace 'fetch\\\\\\(`/api/v1/', 'authFetch\\(`/api/v1/'\nSet-Content $file $content -NoNewline\nWrite-Host \"Done. Replacements applied.\"\nPSEOF)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\bathini bona\\\\Documents\\\\EduSMS\\\\fix_fetch.ps1\")",
+      "Bash(powershell -Command \"Select-String -Path 'C:\\\\Users\\\\bathini bona\\\\Documents\\\\EduSMS\\\\frontend\\\\src\\\\app\\\\dashboard\\\\teacher\\\\planning\\\\page.tsx' -Pattern 'authFetch|import.*authFetch'\":*)",
+      "Bash(powershell -Command \"Select-String -Path ''C:\\\\Users\\\\bathini bona\\\\Documents\\\\EduSMS\\\\frontend\\\\src\\\\app\\\\dashboard\\\\teacher\\\\planning\\\\page.tsx'' -Pattern ''[^a]fetch\\\\\\('' -CaseSensitive\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File fix-auth.ps1)"
     ]
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -26,7 +27,7 @@ export default function PrincipalDashboardPage() {
   const fetchSummary = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/principal/summary?range=${dateRange}`);
+      const res = await authFetch(`/api/v1/principal/summary?range=${dateRange}`);
       const data = await res.json();
       setSummary(data);
     } catch (error) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,9 +23,9 @@ export default function PrincipalAttendancePage() {
   useEffect(() => { fetchData(); }, [selectedDate]);
 
   const fetchData = async () => {
-    const res = await fetch(`/api/v1/principal-dashboard/attendance/summary?date=${selectedDate}`);
+    const res = await authFetch(`/api/v1/principal-dashboard/attendance/summary?date=${selectedDate}`);
     setSummary(await res.json());
-    const classRes = await fetch(`/api/v1/principal-dashboard/attendance/classes?date=${selectedDate}`);
+    const classRes = await authFetch(`/api/v1/principal-dashboard/attendance/classes?date=${selectedDate}`);
     setClasses(await classRes.json());
   };
 

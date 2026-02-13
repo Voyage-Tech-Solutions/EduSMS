@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,7 @@ export default function DocumentsPage() {
   }, [filters]);
 
   const fetchSummary = async () => {
-    const res = await fetch("/api/v1/documents/compliance-summary");
+    const res = await authFetch("/api/v1/documents/compliance-summary");
     const data = await res.json();
     setSummary(data);
   };
@@ -34,7 +35,7 @@ export default function DocumentsPage() {
     if (filters.status) params.append("status", filters.status);
     if (filters.type) params.append("document_type", filters.type);
     
-    const res = await fetch(`/api/v1/documents/documents?${params}`);
+    const res = await authFetch(`/api/v1/documents/documents?${params}`);
     const data = await res.json();
     setDocuments(data);
   };
@@ -43,7 +44,7 @@ export default function DocumentsPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    await fetch("/api/v1/documents/documents", {
+    await authFetch("/api/v1/documents/documents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -63,7 +64,7 @@ export default function DocumentsPage() {
   };
 
   const handleVerify = async (verified: boolean) => {
-    await fetch(`/api/v1/documents/documents/${selectedDoc.id}/verify`, {
+    await authFetch(`/api/v1/documents/documents/${selectedDoc.id}/verify`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ verified })

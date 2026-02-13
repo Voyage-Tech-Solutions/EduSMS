@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +14,13 @@ export default function ProfilePage() {
   const [notifications, setNotifications] = useState({ sms: true, email: true, push: true });
 
   useEffect(() => {
-    fetch("/api/v1/parent/profile")
+    authFetch("/api/v1/parent/profile")
       .then(res => res.json())
       .then(data => setProfile(data));
   }, []);
 
   const handleSave = async () => {
-    await fetch("/api/v1/parent/profile", {
+    await authFetch("/api/v1/parent/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...profile, notification_preferences: notifications })

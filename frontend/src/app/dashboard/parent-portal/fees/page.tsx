@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -21,7 +22,7 @@ export default function ParentFeesPage() {
 
   const fetchInvoices = async () => {
     const studentId = "student-id";
-    const response = await fetch(`/api/v1/parent/invoices?student_id=${studentId}`);
+    const response = await authFetch(`/api/v1/parent/invoices?student_id=${studentId}`);
     const data = await response.json();
     setInvoices(data);
     setLoading(false);
@@ -145,7 +146,7 @@ function PaymentDialog({ invoice, onSuccess }: any) {
   });
 
   const handlePayment = async () => {
-    await fetch("/api/v1/parent/payments", {
+    await authFetch("/api/v1/parent/payments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ invoice_id: invoice.id, ...payment }),

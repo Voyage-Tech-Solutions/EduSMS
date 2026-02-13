@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,7 @@ export default function FeesPage() {
   }, [filters]);
 
   const fetchSummary = async () => {
-    const res = await fetch("/api/v1/fees/summary");
+    const res = await authFetch("/api/v1/fees/summary");
     const data = await res.json();
     setSummary(data);
   };
@@ -34,7 +35,7 @@ export default function FeesPage() {
     if (filters.status) params.append("status", filters.status);
     if (filters.term) params.append("term_id", filters.term);
     
-    const res = await fetch(`/api/v1/fees/invoices?${params}`);
+    const res = await authFetch(`/api/v1/fees/invoices?${params}`);
     const data = await res.json();
     setInvoices(data);
   };
@@ -43,7 +44,7 @@ export default function FeesPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    await fetch("/api/v1/fees/invoices", {
+    await authFetch("/api/v1/fees/invoices", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -64,7 +65,7 @@ export default function FeesPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    await fetch("/api/v1/fees/payments", {
+    await authFetch("/api/v1/fees/payments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

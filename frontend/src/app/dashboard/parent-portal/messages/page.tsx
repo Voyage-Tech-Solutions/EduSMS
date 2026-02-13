@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,7 +21,7 @@ export default function ParentMessagesPage() {
   }, []);
 
   const fetchMessages = async () => {
-    const response = await fetch("/api/v1/parent/messages");
+    const response = await authFetch("/api/v1/parent/messages");
     const data = await response.json();
     setMessages(data.messages || []);
     setLoading(false);
@@ -142,7 +143,7 @@ function ComposeMessageDialog({ onSuccess }: any) {
   });
 
   const handleSend = async () => {
-    await fetch("/api/v1/parent/messages", {
+    await authFetch("/api/v1/parent/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(message),

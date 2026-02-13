@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,7 +21,7 @@ export default function ParentAttendancePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/parent/children")
+    authFetch("/api/v1/parent/children")
       .then(res => res.json())
       .then(data => {
         setChildren(data.children || []);
@@ -34,7 +35,7 @@ export default function ParentAttendancePage() {
 
   const fetchAttendance = async () => {
     setLoading(true);
-    const response = await fetch(`/api/v1/parent/attendance?student_id=${selectedChild}`);
+    const response = await authFetch(`/api/v1/parent/attendance?student_id=${selectedChild}`);
     const data = await response.json();
     setAttendance(data);
     setLoading(false);
@@ -207,7 +208,7 @@ function ReportAbsenceDialog({ studentId, onSuccess }: any) {
   }, []);
 
   const handleSubmit = async () => {
-    await fetch("/api/v1/parent/attendance/report-absence", {
+    await authFetch("/api/v1/parent/attendance/report-absence", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_id: studentId, ...data }),

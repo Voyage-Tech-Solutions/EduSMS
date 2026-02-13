@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -24,7 +25,7 @@ export default function ReportsPage() {
     if (dateRange.start) params.append("start_date", dateRange.start);
     if (dateRange.end) params.append("end_date", dateRange.end);
     
-    const res = await fetch(`/api/v1/reports/summary?${params}`);
+    const res = await authFetch(`/api/v1/reports/summary?${params}`);
     const data = await res.json();
     setSummary(data);
   };

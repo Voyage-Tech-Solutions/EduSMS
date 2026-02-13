@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -16,7 +17,7 @@ export default function ParentAcademicsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/parent/children")
+    authFetch("/api/v1/parent/children")
       .then(res => res.json())
       .then(data => {
         setChildren(data.children || []);
@@ -29,7 +30,7 @@ export default function ParentAcademicsPage() {
   }, [selectedChild]);
 
   const fetchAcademics = async () => {
-    const response = await fetch(`/api/v1/parent/academics?student_id=${selectedChild}`);
+    const response = await authFetch(`/api/v1/parent/academics?student_id=${selectedChild}`);
     const data = await response.json();
     setAcademics(data);
     setLoading(false);

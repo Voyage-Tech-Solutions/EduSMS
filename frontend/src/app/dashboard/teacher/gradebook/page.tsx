@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ export default function TeacherGradebookPage() {
   const fetchGradebook = async () => {
     if (!classId || !subjectId) return;
     setLoading(true);
-    const response = await fetch(`/api/v1/teacher/gradebook?class_id=${classId}&subject_id=${subjectId}&term_id=${termId}`);
+    const response = await authFetch(`/api/v1/teacher/gradebook?class_id=${classId}&subject_id=${subjectId}&term_id=${termId}`);
     const data = await response.json();
     setGradebook(data);
     setLoading(false);
@@ -33,7 +34,7 @@ export default function TeacherGradebookPage() {
   }, [classId, subjectId, termId]);
 
   const updateScore = async (assessmentId: string, studentId: string, score: number) => {
-    await fetch(`/api/v1/teacher/gradebook/assessments/${assessmentId}/scores`, {
+    await authFetch(`/api/v1/teacher/gradebook/assessments/${assessmentId}/scores`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify([{ student_id: studentId, score }]),
@@ -212,7 +213,7 @@ function AddAssessmentDialog({ onSuccess, classId, subjectId, termId }: any) {
   }, []);
 
   const handleSubmit = async () => {
-    await fetch("/api/v1/teacher/gradebook/assessments", {
+    await authFetch("/api/v1/teacher/gradebook/assessments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, class_id: classId, subject_id: subjectId, term_id: termId }),
@@ -284,7 +285,7 @@ function LockGradebookDialog({ classId, subjectId, termId, onSuccess }: any) {
   const [reason, setReason] = useState("");
 
   const handleLock = async () => {
-    await fetch("/api/v1/teacher/gradebook/lock", {
+    await authFetch("/api/v1/teacher/gradebook/lock", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ class_id: classId, subject_id: subjectId, term_id: termId, reason }),

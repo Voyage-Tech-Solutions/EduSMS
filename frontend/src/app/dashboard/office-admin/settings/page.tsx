@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -22,9 +23,9 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     const [school, attendance, billing] = await Promise.all([
-      fetch("/api/v1/settings/school").then(r => r.json()),
-      fetch("/api/v1/settings/attendance").then(r => r.json()),
-      fetch("/api/v1/settings/billing").then(r => r.json())
+      authFetch("/api/v1/settings/school").then(r => r.json()),
+      authFetch("/api/v1/settings/attendance").then(r => r.json()),
+      authFetch("/api/v1/settings/billing").then(r => r.json())
     ]);
     
     setSchoolSettings(school);
@@ -33,7 +34,7 @@ export default function SettingsPage() {
   };
 
   const handleSaveSchool = async () => {
-    await fetch("/api/v1/settings/school", {
+    await authFetch("/api/v1/settings/school", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(schoolSettings)
@@ -42,7 +43,7 @@ export default function SettingsPage() {
   };
 
   const handleSaveAttendance = async () => {
-    await fetch("/api/v1/settings/attendance", {
+    await authFetch("/api/v1/settings/attendance", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(attendanceSettings)
@@ -51,7 +52,7 @@ export default function SettingsPage() {
   };
 
   const handleSaveBilling = async () => {
-    await fetch("/api/v1/settings/billing", {
+    await authFetch("/api/v1/settings/billing", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(billingSettings)

@@ -265,6 +265,54 @@ async def get_attendance_summary(
         "attendance_rate": round(((present + late) / total * 100), 1) if total > 0 else 0
     }
 
+@router.get("/attendance/classes")
+async def get_attendance_by_classes(
+    date: Optional[date] = Query(default=None),
+    user=Depends(get_current_user),
+    supabase=Depends(get_supabase_client)
+):
+    """Get attendance breakdown by class for a given date"""
+    school_id = get_user_school_id(user)
+    target_date = date.isoformat() if date else datetime.now().date().isoformat()
+
+    classes = supabase.table("classes").select(
+        "id, name, grade_id, grades(name)"
+    ).eq("school_id", school_id).execute().data
+
+    result = []
+    for cls in classes:
+        students = supabase.table("students").select("id").eq(
+            "class_id", cls["id"]
+        ).eq("status", "active").execute().data
+        student_ids = [s["id"] for s in students]
+
+        if not student_ids:
+            continue
+
+        attendance = supabase.table("attendance_records").select(
+            "status"
+        ).in_("student_id", student_ids).eq("date", target_date).execute().data
+
+        submitted = len(attendance) > 0
+        present = len([a for a in attendance if a["status"] in ("present", "late")])
+        absent = len([a for a in attendance if a["status"] == "absent"])
+        rate = round((present / len(attendance) * 100), 1) if attendance else 0
+
+        grade_name = cls.get("grades", {}).get("name", "N/A") if cls.get("grades") else "N/A"
+
+        result.append({
+            "id": cls["id"],
+            "name": cls["name"],
+            "grade": grade_name,
+            "teacher": "—",
+            "submitted": submitted,
+            "total_students": len(student_ids),
+            "attendance_rate": rate,
+            "absent": absent,
+        })
+
+    return result
+
 @router.get("/attendance/missing-submissions")
 async def get_missing_submissions(
     date: date = Query(default_factory=date.today),

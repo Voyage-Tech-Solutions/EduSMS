@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ export default function TeacherPlanningPage() {
   const fetchPlan = async () => {
     if (!classId || !subjectId) return;
     setLoading(true);
-    const response = await fetch(`/api/v1/teacher/planning?week=${week}&class_id=${classId}&subject_id=${subjectId}`);
+    const response = await authFetch(`/api/v1/teacher/planning?week=${week}&class_id=${classId}&subject_id=${subjectId}`);
     const data = await response.json();
     setPlan(data);
     setLoading(false);
@@ -178,7 +179,7 @@ export default function TeacherPlanningPage() {
   );
 
   async function markDelivered(lessonId: string) {
-    await fetch(`/api/v1/teacher/planning/lessons/${lessonId}/status`, {
+    await authFetch(`/api/v1/teacher/planning/lessons/${lessonId}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "delivered" }),
@@ -196,7 +197,7 @@ function AddLessonDialog({ onSuccess, classId, subjectId }: any) {
   }, []);
 
   const handleSubmit = async () => {
-    await fetch("/api/v1/teacher/planning/lessons", {
+    await authFetch("/api/v1/teacher/planning/lessons", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, class_id: classId, subject_id: subjectId, term_id: "term1" }),
@@ -240,7 +241,7 @@ function CopyWeekDialog({ currentWeek, onSuccess }: any) {
   const [open, setOpen] = useState(false);
 
   const handleCopy = async () => {
-    await fetch("/api/v1/teacher/planning/copy-week", {
+    await authFetch("/api/v1/teacher/planning/copy-week", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ from_week: currentWeek, to_week: currentWeek, copy_resources: true }),
@@ -270,7 +271,7 @@ function UploadResourceDialog({ onSuccess, classId, subjectId }: any) {
   const [data, setData] = useState({ title: "", type: "file", url: "" });
 
   const handleSubmit = async () => {
-    await fetch("/api/v1/teacher/planning/resources", {
+    await authFetch("/api/v1/teacher/planning/resources", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, class_id: classId, subject_id: subjectId }),
@@ -322,7 +323,7 @@ function AddAssessmentPlanDialog({ onSuccess, classId, subjectId }: any) {
   }, []);
 
   const handleSubmit = async () => {
-    await fetch("/api/v1/teacher/planning/assessments", {
+    await authFetch("/api/v1/teacher/planning/assessments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, class_id: classId, subject_id: subjectId, term_id: "term1" }),

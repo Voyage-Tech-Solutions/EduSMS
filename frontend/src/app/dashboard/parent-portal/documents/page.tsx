@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -21,7 +22,7 @@ export default function ParentDocumentsPage() {
 
   const fetchDocuments = async () => {
     const studentId = "student-id";
-    const response = await fetch(`/api/v1/parent/documents?student_id=${studentId}`);
+    const response = await authFetch(`/api/v1/parent/documents?student_id=${studentId}`);
     const data = await response.json();
     setDocuments(data.documents || []);
     setLoading(false);
@@ -169,7 +170,7 @@ function UploadDocumentDialog({ documentType, onSuccess }: any) {
 
   const handleUpload = async () => {
     const studentId = "student-id";
-    await fetch("/api/v1/parent/documents/upload", {
+    await authFetch("/api/v1/parent/documents/upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ student_id: studentId, ...data }),

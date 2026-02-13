@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,7 +20,7 @@ export default function ParentAssignmentsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/v1/parent/children")
+    authFetch("/api/v1/parent/children")
       .then(res => res.json())
       .then(data => {
         setChildren(data.children || []);
@@ -32,7 +33,7 @@ export default function ParentAssignmentsPage() {
   }, [selectedChild]);
 
   const fetchAssignments = async () => {
-    const response = await fetch(`/api/v1/parent/assignments?student_id=${selectedChild}`);
+    const response = await authFetch(`/api/v1/parent/assignments?student_id=${selectedChild}`);
     const data = await response.json();
     setAssignments(data.assignments || []);
     setLoading(false);
@@ -217,7 +218,7 @@ function SubmitAssignmentDialog({ assignment, onSuccess }: any) {
   const [selectedChild, setSelectedChild] = useState("");
 
   useEffect(() => {
-    fetch("/api/v1/parent/children")
+    authFetch("/api/v1/parent/children")
       .then(res => res.json())
       .then(data => {
         if (data.children?.length > 0) setSelectedChild(data.children[0].student_id);
@@ -225,7 +226,7 @@ function SubmitAssignmentDialog({ assignment, onSuccess }: any) {
   }, []);
 
   const handleSubmit = async () => {
-    await fetch("/api/v1/parent/assignments/submit", {
+    await authFetch("/api/v1/parent/assignments/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

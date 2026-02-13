@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from "@/lib/authFetch";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +17,7 @@ export default function FeaturesPage() {
 
     const loadFeatures = async () => {
         try {
-            const response = await fetch('/api/v1/system/features');
+            const response = await authFetch('/api/v1/system/features');
             const data = await response.json();
             setFeatures(data);
         } catch (error) {
@@ -27,7 +28,7 @@ export default function FeaturesPage() {
 
     const toggleFeature = async (featureId: string, currentStatus: string) => {
         try {
-            await fetch(`/api/v1/system/features/${featureId}/toggle`, {
+            await authFetch(`/api/v1/system/features/${featureId}/toggle`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ enabled: currentStatus !== 'enabled' }),

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { authFetch } from '@/lib/authFetch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +32,7 @@ export function AddUserDialog({ onUserAdded }: AddUserDialogProps) {
 
     const loadSchools = async () => {
         try {
-            const response = await fetch('/api/v1/system/schools');
+            const response = await authFetch('/api/v1/system/schools');
             const data = await response.json();
             setSchools(data);
         } catch (error) {
@@ -44,7 +45,7 @@ export function AddUserDialog({ onUserAdded }: AddUserDialogProps) {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/v1/system/users', {
+            const response = await authFetch('/api/v1/system/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { authFetch } from "@/lib/authFetch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,20 +26,20 @@ export default function PrincipalStudentsPage() {
   }, [filters]);
 
   const fetchSummary = async () => {
-    const res = await fetch("/api/v1/principal/students/summary");
+    const res = await authFetch("/api/v1/principal/students/summary");
     const data = await res.json();
     setSummary(data);
   };
 
   const fetchStudents = async () => {
     const params = new URLSearchParams(filters as any);
-    const res = await fetch(`/api/v1/principal/students?${params}`);
+    const res = await authFetch(`/api/v1/principal/students?${params}`);
     const data = await res.json();
     setStudents(data);
   };
 
   const handleFlagIntervention = async (data: any) => {
-    await fetch("/api/v1/principal/students/risk", {
+    await authFetch("/api/v1/principal/students/risk", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...data, student_id: selectedStudent.id })
@@ -48,7 +49,7 @@ export default function PrincipalStudentsPage() {
   };
 
   const handleChangeStatus = async (data: any) => {
-    await fetch(`/api/v1/principal/students/${selectedStudent.id}/status`, {
+    await authFetch(`/api/v1/principal/students/${selectedStudent.id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)

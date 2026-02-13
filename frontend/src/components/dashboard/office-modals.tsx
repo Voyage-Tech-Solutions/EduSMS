@@ -71,8 +71,7 @@ export function SaveAttendanceModal({ open, onClose, onSuccess }: any) {
                                 <SelectValue placeholder="Select class" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="class1">Grade 1A</SelectItem>
-                                <SelectItem value="class2">Grade 1B</SelectItem>
+                                {/* Dynamic class list will be loaded */}
                             </SelectContent>
                         </Select>
                     </div>
@@ -165,7 +164,7 @@ export function CreateInvoiceModal({ open, onClose, onSuccess }: any) {
                                 <SelectValue placeholder="Search student" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="student1">John Doe</SelectItem>
+                                {/* Dynamic student list will be loaded */}
                             </SelectContent>
                         </Select>
                     </div>
@@ -304,7 +303,7 @@ export function AddStudentModal({ open, onClose, onSuccess }: any) {
                                     <SelectValue placeholder="Select grade" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="grade1">Grade 1</SelectItem>
+                                    {/* Dynamic grade list will be loaded */}
                                 </SelectContent>
                             </Select>
                         </div>

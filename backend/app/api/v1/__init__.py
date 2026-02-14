@@ -27,6 +27,7 @@ from app.api.v1.teacher_planning import router as teacher_planning_router
 from app.api.v1.parent_dashboard import router as parent_dashboard_router
 from app.api.v1.principal_dashboard_complete import router as principal_dashboard_router
 from app.api.v1.principal_oversight import router as principal_oversight_router
+from app.api.v1.sysadmin import router as sysadmin_router
 
 
 # Create main API router
@@ -59,3 +60,4 @@ api_router.include_router(parent_router, prefix="/parent", tags=["parent"])
 api_router.include_router(parent_dashboard_router, prefix="/parent", tags=["parent_dashboard"])
 api_router.include_router(principal_dashboard_router, prefix="/principal-dashboard", tags=["principal_dashboard"])
 api_router.include_router(student_router, prefix="/student", tags=["student"])
+api_router.include_router(sysadmin_router)

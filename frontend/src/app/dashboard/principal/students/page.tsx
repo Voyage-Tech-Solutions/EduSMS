@@ -26,16 +26,26 @@ export default function PrincipalStudentsPage() {
   }, [filters]);
 
   const fetchSummary = async () => {
-    const res = await authFetch("/api/v1/principal/students/summary");
-    const data = await res.json();
-    setSummary(data);
+    try {
+      const res = await authFetch("/api/v1/principal/students/summary");
+      const data = await res.json();
+      setSummary(data || {});
+    } catch (error) {
+      console.error('Failed to fetch summary:', error);
+      setSummary({});
+    }
   };
 
   const fetchStudents = async () => {
-    const params = new URLSearchParams(filters as any);
-    const res = await authFetch(`/api/v1/principal/students?${params}`);
-    const data = await res.json();
-    setStudents(data);
+    try {
+      const params = new URLSearchParams(filters as any);
+      const res = await authFetch(`/api/v1/principal/students?${params}`);
+      const data = await res.json();
+      setStudents(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch students:', error);
+      setStudents([]);
+    }
   };
 
   const handleFlagIntervention = async (data: any) => {
@@ -174,7 +184,13 @@ export default function PrincipalStudentsPage() {
               </tr>
             </thead>
             <tbody>
-              {students.map((student) => (
+              {students.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="p-8 text-center text-gray-500">
+                    No students found matching the filters
+                  </td>
+                </tr>
+              ) : students.map((student) => (
                 <tr key={student.id} className="border-t hover:bg-gray-50">
                   <td className="p-3">{student.admission_number}</td>
                   <td className="p-3 font-medium">{student.first_name} {student.last_name}</td>

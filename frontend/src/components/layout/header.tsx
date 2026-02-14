@@ -52,30 +52,14 @@ export function Header() {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="relative">
                                 <Bell className="h-5 w-5 text-slate-600" />
-                                <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-red-500">
-                                    3
-                                </Badge>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-80">
                             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="flex flex-col items-start py-3">
-                                <span className="font-medium">New admission request</span>
-                                <span className="text-sm text-slate-500">John Smith applied for Grade 5</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="flex flex-col items-start py-3">
-                                <span className="font-medium">Fee payment received</span>
-                                <span className="text-sm text-slate-500">$500 received from Jane Doe</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="flex flex-col items-start py-3">
-                                <span className="font-medium">Report pending approval</span>
-                                <span className="text-sm text-slate-500">Grade 8 Term 1 reports ready</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-center text-emerald-600">
-                                View all notifications
-                            </DropdownMenuItem>
+                            <div className="py-8 text-center text-slate-500 text-sm">
+                                No new notifications
+                            </div>
                         </DropdownMenuContent>
                     </DropdownMenu>
 

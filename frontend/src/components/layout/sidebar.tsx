@@ -45,13 +45,14 @@ interface NavItem {
 }
 
 const systemAdminNavItems: NavItem[] = [
-    { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'Schools', href: '/dashboard/schools', icon: Building2 },
-    { title: 'Users', href: '/dashboard/users', icon: Users },
-    { title: 'Security', href: '/dashboard/security', icon: Shield },
-    { title: 'System Logs', href: '/dashboard/logs', icon: Activity },
-    { title: 'Feature Flags', href: '/dashboard/features', icon: Flag },
-    { title: 'Settings', href: '/dashboard/settings', icon: Settings },
+    { title: 'Overview', href: '/dashboard/sysadmin', icon: LayoutDashboard },
+    { title: 'Tenants', href: '/dashboard/sysadmin/tenants', icon: Building2 },
+    { title: 'Billing', href: '/dashboard/sysadmin/billing', icon: CreditCard },
+    { title: 'Features', href: '/dashboard/sysadmin/features', icon: Flag },
+    { title: 'Security', href: '/dashboard/sysadmin/security', icon: Shield },
+    { title: 'Monitoring', href: '/dashboard/sysadmin/monitoring', icon: Activity },
+    { title: 'Support', href: '/dashboard/sysadmin/support', icon: Bell },
+    { title: 'Settings', href: '/dashboard/sysadmin/settings', icon: Settings },
 ];
 
 const teacherNavItems: NavItem[] = [

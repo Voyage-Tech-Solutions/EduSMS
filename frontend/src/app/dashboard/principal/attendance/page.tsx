@@ -12,21 +12,30 @@ import { AlertTriangle, Send } from "lucide-react";
 export default function PrincipalAttendancePage() {
   const [summary, setSummary] = useState<any>({});
   const [classes, setClasses] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState('');
-
-  useEffect(() => {
-    setSelectedDate(new Date().toISOString().split('T')[0]);
-  }, []);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showMissingModal, setShowMissingModal] = useState(false);
   const [showReminderModal, setShowReminderModal] = useState(false);
 
-  useEffect(() => { fetchData(); }, [selectedDate]);
+  useEffect(() => {
+    if (selectedDate) {
+      fetchData();
+    }
+  }, [selectedDate]);
 
   const fetchData = async () => {
-    const res = await authFetch(`/api/v1/principal-dashboard/attendance/summary?date=${selectedDate}`);
-    setSummary(await res.json());
-    const classRes = await authFetch(`/api/v1/principal-dashboard/attendance/classes?date=${selectedDate}`);
-    setClasses(await classRes.json());
+    try {
+      const res = await authFetch(`/api/v1/principal-dashboard/attendance/summary?date=${selectedDate}`);
+      const summaryData = await res.json();
+      setSummary(summaryData || {});
+      
+      const classRes = await authFetch(`/api/v1/principal-dashboard/attendance/classes?date=${selectedDate}`);
+      const classData = await classRes.json();
+      setClasses(Array.isArray(classData) ? classData : []);
+    } catch (error) {
+      console.error('Failed to fetch attendance data:', error);
+      setSummary({});
+      setClasses([]);
+    }
   };
 
   return (
@@ -82,7 +91,13 @@ export default function PrincipalAttendancePage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {classes.map((cls) => (
+              {classes.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    No attendance data available for this date
+                  </td>
+                </tr>
+              ) : classes.map((cls) => (
                 <tr key={cls.id}>
                   <td className="px-4 py-3">{cls.grade}</td>
                   <td className="px-4 py-3">{cls.name}</td>

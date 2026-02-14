@@ -23,15 +23,25 @@ export default function PrincipalApprovalsPage() {
   }, [filter]);
 
   const fetchSummary = async () => {
-    const res = await authFetch("/api/v1/principal/approvals/summary");
-    const data = await res.json();
-    setSummary(data);
+    try {
+      const res = await authFetch("/api/v1/principal/approvals/summary");
+      const data = await res.json();
+      setSummary(data || {});
+    } catch (error) {
+      console.error('Failed to fetch summary:', error);
+      setSummary({});
+    }
   };
 
   const fetchApprovals = async () => {
-    const res = await authFetch(`/api/v1/principal/approvals?status=${filter}`);
-    const data = await res.json();
-    setApprovals(data);
+    try {
+      const res = await authFetch(`/api/v1/principal/approvals?status=${filter}`);
+      const data = await res.json();
+      setApprovals(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to fetch approvals:', error);
+      setApprovals([]);
+    }
   };
 
   const handleDecision = async (decision: string, notes: string) => {

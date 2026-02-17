@@ -54,14 +54,55 @@ export default function OfficeAdminDashboard() {
                 fetch(`${baseUrl}/office-admin/exceptions`, { headers }).catch(() => ({ ok: false } as Response))
             ]);
 
-            if (prioritiesRes.ok) setPriorities(await prioritiesRes.json());
-            if (feesRes.ok) setFees(await feesRes.json());
-            if (studentsRes.ok) setStudents(await studentsRes.json());
-            if (docsRes.ok) setDocuments(await docsRes.json());
-            if (activityRes.ok) setActivity(await activityRes.json());
-            if (exceptionsRes.ok) setExceptions(await exceptionsRes.json());
+            if (prioritiesRes.ok) {
+                const data = await prioritiesRes.json();
+                setPriorities(data || {});
+            } else {
+                setPriorities({});
+            }
+            
+            if (feesRes.ok) {
+                const data = await feesRes.json();
+                setFees(data || {});
+            } else {
+                setFees({});
+            }
+            
+            if (studentsRes.ok) {
+                const data = await studentsRes.json();
+                setStudents(data || {});
+            } else {
+                setStudents({});
+            }
+            
+            if (docsRes.ok) {
+                const data = await docsRes.json();
+                setDocuments(data || {});
+            } else {
+                setDocuments({});
+            }
+            
+            if (activityRes.ok) {
+                const data = await activityRes.json();
+                setActivity(Array.isArray(data) ? data : []);
+            } else {
+                setActivity([]);
+            }
+            
+            if (exceptionsRes.ok) {
+                const data = await exceptionsRes.json();
+                setExceptions(Array.isArray(data) ? data : []);
+            } else {
+                setExceptions([]);
+            }
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error);
+            setPriorities({});
+            setFees({});
+            setStudents({});
+            setDocuments({});
+            setActivity([]);
+            setExceptions([]);
         } finally {
             setLoading(false);
         }
